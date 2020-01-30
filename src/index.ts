@@ -9,18 +9,13 @@ export const index: PluginFunction = async (schema, documents) => {
   documents.forEach(d => {
     if (d.document) {
       d.document.definitions.forEach(d => {
-        if (
-          d.kind === "OperationDefinition" &&
-          d.operation === "query" &&
-          d.name
-        ) {
+        if (d.kind === "OperationDefinition" && d.operation === "query" && d.name) {
           factories.push(newQueryFactory(d));
         }
       });
     }
   });
-  const content =
-    (await code`${factories}`.toStringWithImports()) + mockedResponse;
+  const content = (await code`${factories}`.toStringWithImports()) + mockedResponse;
   return { content } as PluginOutput;
 };
 
@@ -33,9 +28,7 @@ function newQueryFactory(def: OperationDefinitionNode): Code {
       data: ${name}Query | Error
     ): MockedResponse<${name}QueryVariables, ${name}Query> {
       return {
-        request: { query: ${name}Document, ${
-    hasVariables ? "variables, " : ""
-  } },
+        request: { query: ${name}Document, ${hasVariables ? "variables, " : ""} },
         result: { data: data instanceof Error ? undefined : data },
         error: data instanceof Error ? data : undefined,
       };
