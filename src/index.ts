@@ -4,7 +4,7 @@ import { PluginFunction, Types } from "@graphql-codegen/plugin-helpers";
 import PluginOutput = Types.PluginOutput;
 
 /** Generates `newQueryResponse({ ... })` factory functions in our `graphql-types` codegen output. */
-export const index: PluginFunction = async (schema, documents) => {
+export const plugin: PluginFunction = async (schema, documents) => {
   const factories: Code[] = [];
   documents.forEach(d => {
     if (d.document) {
