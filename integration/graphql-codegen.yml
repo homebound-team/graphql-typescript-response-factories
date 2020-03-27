@@ -1,0 +1,10 @@
+overwrite: true
+schema: "./integration/schema.graphql"
+documents: "./integration/queries.graphql"
+generates:
+  integration/graphql-types.tsx:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
+      - ./build/src/index.js

@@ -6,7 +6,8 @@
     "strict": true,
     "esModuleInterop": false,
     "skipLibCheck": true,
-    "outDir": "build"
+    "outDir": "build",
+    "jsx": "react"
   },
   "includes": ["src"]
 }
