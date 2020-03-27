@@ -10,8 +10,8 @@
     "graphql-codegen": "graphql-codegen --config ./integration/graphql-codegen.yml"
   },
   "dependencies": {
-    "@graphql-codegen/cli": "^1.12.1",
-    "@graphql-codegen/plugin-helpers": "^1.12.1",
+    "@graphql-codegen/cli": "^1.13.1",
+    "@graphql-codegen/plugin-helpers": "^1.13.1",
     "ts-poet": "^3.0.0"
   },
   "devDependencies": {
