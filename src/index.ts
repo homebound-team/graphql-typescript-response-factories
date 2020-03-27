@@ -25,11 +25,11 @@ function newQueryFactory(def: OperationDefinitionNode): Code {
   return code`
     export function new${name}Response(
       ${hasVariables ? `variables: ${name}QueryVariables,` : ""}
-      data: ${name}Query | Error
+      data: Omit<${name}Query, "__typename"> | Error
     ): MockedResponse<${name}QueryVariables, ${name}Query> {
       return {
         request: { query: ${name}Document, ${hasVariables ? "variables, " : ""} },
-        result: { data: data instanceof Error ? undefined : data },
+        result: { data: data instanceof Error ? undefined : { __typename: "Query", ...data } },
         error: data instanceof Error ? data : undefined,
       };
     }`;
