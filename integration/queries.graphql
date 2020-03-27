@@ -1,0 +1,14 @@
+query GetAuthorSummaries {
+  authorSummaries {
+    author {
+      name
+    }
+  }
+}
+mutation SaveAuthor($input: AuthorInput!) {
+  saveAuthor(input: $input) {
+    author {
+      name
+    }
+  }
+}
