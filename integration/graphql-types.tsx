@@ -175,11 +175,21 @@ export function withSaveAuthor<TProps, TChildProps = {}>(operationOptions?: Apol
 export type SaveAuthorMutationResult = ApolloReactCommon.MutationResult<SaveAuthorMutation>;
 export type SaveAuthorMutationOptions = ApolloReactCommon.BaseMutationOptions<SaveAuthorMutation, SaveAuthorMutationVariables>;
 export function newGetAuthorSummariesResponse(
-  data: GetAuthorSummariesQuery | Error,
+  data: Omit<GetAuthorSummariesQuery, "__typename"> | Error,
 ): MockedResponse<GetAuthorSummariesQueryVariables, GetAuthorSummariesQuery> {
   return {
     request: { query: GetAuthorSummariesDocument },
-    result: { data: data instanceof Error ? undefined : data },
+    result: { data: data instanceof Error ? undefined : { __typename: "Query", ...data } },
+    error: data instanceof Error ? data : undefined,
+  };
+}
+export function newSaveAuthorResponse(
+  variables: SaveAuthorMutationVariables,
+  data: Omit<SaveAuthorMutation, "__typename"> | Error,
+): MockedResponse<SaveAuthorMutationVariables, SaveAuthorMutation> {
+  return {
+    request: { query: SaveAuthorDocument, variables },
+    result: { data: data instanceof Error ? undefined : { __typename: "Mutation", ...data } },
     error: data instanceof Error ? data : undefined,
   };
 }
