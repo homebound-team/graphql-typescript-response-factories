@@ -1,7 +1,7 @@
 
 # graphql-typescript-response-factories
 
-This `graphql-code-generator` plugin makes small helper functions for creating react-apollo mock responses for testing client-side GraphQL code.
+This `graphql-code-generator` plugin generates factory methods for the react-apollo `MockedResponse`s that are used for testing client-side GraphQL code.
 
 I.e. for a given query like:
 
@@ -29,8 +29,31 @@ export function newGetAuthorSummariesResponse(
 }
 ```
 
-Where the function takes a union type of either the data (i.e. `GetAuthorSummariesQuery`), or `Error`, and then the implementation fills out the `MockedResponse` (from React Apollo) with the corresponding structure.
+That you can use in a test like:
 
-For factories for the `GetAuthorSummariesQuery`, see the `graphql-typescript-factories` project.
+```typescript
+const response = newGetAuthorSummariesResponse({
+  // Use newAuthorSummary from the graphql-typescript-factories project
+  authorSummaries: [newAuthorSummary()],
+});
 
+// Something react-testing-library's render
+const component = render(
+  <MockedProvider mocks={[response]}>
+    <YourComponent />
+  </MockedProvider>
+);
+```
+
+Or you can simulate an error with:
+
+```typescript
+const response = newGetAuthorSummariesResponse(new Error("bad"));
+```
+
+For non-`react-apollo`-specific factories for the rest of your GraphQL schema's types, see the [graphql-typescript-factories](https://github.com/homebound-team/graphql-typescript-factories) sister project.
+
+## License
+
+MIT
 
