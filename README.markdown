@@ -53,6 +53,28 @@ const response = newGetAuthorSummariesResponse(new Error("bad"));
 
 For non-`react-apollo`-specific factories for the rest of your GraphQL schema's types, see the [graphql-typescript-factories](https://github.com/homebound-team/graphql-typescript-factories) sister project.
 
+## Install
+
+```shell
+npm -i @homebound/graphql-typescript-response-factories
+```
+
+Add the plugin to your `graphql-codegen.yml`, i.e.:
+
+```yaml
+overwrite: true
+schema: ./schema.json
+documents: src/**/*.graphql
+generates:
+  src/generated/graphql-types.tsx:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
+      - "@homebound/graphql-typescript-factories"
+      - "@homebound/graphql-typescript-response-factories"
+```
+
 ## License
 
 MIT
