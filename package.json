@@ -20,7 +20,7 @@
     "@types/react": "^16.9.43",
     "@graphql-codegen/typescript-react-apollo": "^1.12.1",
     "@graphql-codegen/typescript-operations": "^1.12.1",
-    "@homebound/graphql-typescript-factories": "^1.23.0",
+    "@homebound/graphql-typescript-factories": "^1.24.0",
     "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-prettier": "^3.1.1",
     "husky": "^3.0.9",

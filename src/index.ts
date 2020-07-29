@@ -31,8 +31,28 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
   const hasVariables = (def.variableDefinitions?.length || 0) > 0;
   const operation = `${def.operation.charAt(0).toUpperCase()}${def.operation.slice(1)}`;
   const rootType = operation === "Query" ? schema.getQueryType() : schema.getMutationType();
+
   return code`
-    export function new${name}Data(data: DeepPartial<${name}${operation}>) {
+    interface ${name}DataOptions {
+        ${def.selectionSet.selections.map(s => {
+          if (s.kind === "Field") {
+            const name = s.name.value;
+            const field = rootType?.getFields()[name];
+            if (field) {
+              let type = maybeDenull(field.type);
+              if (type instanceof GraphQLList) {
+                type = maybeDenull(type.ofType);
+                return `${name}?: ${(type as any).name}Options[];`;
+              } else {
+                const orNull = field.type instanceof GraphQLNonNull ? "" : " | null";
+                return `${name}?: ${(type as GraphQLObjectType).name}Options${orNull};`;
+              }
+            }
+          }
+        })}
+    }
+
+    export function new${name}Data(data: ${name}DataOptions) {
       return {
         __typename: "${operation}" as const,
         ${def.selectionSet.selections.map(s => {
@@ -48,7 +68,9 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
                 return `${name}: data["${name}"]?.map(d => new${(type as GraphQLObjectType).name}(d)) || [],`;
               } else {
                 const orNull = field.type instanceof GraphQLNonNull ? "" : "OrNull";
-                return `${name}: maybeNew${orNull}${(type as GraphQLObjectType).name}(data["${name}"] || undefined, {}),`;
+                return `${name}: maybeNew${orNull}${
+                  (type as GraphQLObjectType).name
+                }(data["${name}"] || undefined, {}),`;
               }
             }
           }
@@ -58,7 +80,7 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
 
     export function new${name}Response(
       ${hasVariables ? `variables: ${name}${operation}Variables,` : ""}
-      data: DeepPartial<${name}${operation}> | Error
+      data: ${name}DataOptions | Error
     ): MockedResponse<${name}${operation}Variables, ${name}${operation}> {
       return {
         request: { query: ${name}Document, ${hasVariables ? "variables, " : ""} },

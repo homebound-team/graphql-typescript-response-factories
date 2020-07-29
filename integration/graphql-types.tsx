@@ -211,7 +211,14 @@ export function withCurrentAuthor<TProps, TChildProps = {}>(operationOptions?: A
     });
 };
 export type CurrentAuthorQueryResult = ApolloReactCommon.QueryResult<CurrentAuthorQuery, CurrentAuthorQueryVariables>;
-export type AuthorOptions = DeepPartial<Author>;
+export interface AuthorOptions {
+  __typename?: "Author";
+  name?: Author["name"];
+  summary?: AuthorSummaryOptions;
+  popularity?: Author["popularity"];
+  working?: Author["working"];
+  birthday?: Author["birthday"];
+}
 
 export function newAuthor(options: AuthorOptions = {}, cache: Record<string, any> = {}): Author {
   const o = (cache["Author"] = {} as Author);
@@ -244,7 +251,12 @@ function maybeNewOrNullAuthor(value: AuthorOptions | undefined | null, cache: Re
   }
 }
 
-export type AuthorSummaryOptions = DeepPartial<AuthorSummary>;
+export interface AuthorSummaryOptions {
+  __typename?: "AuthorSummary";
+  author?: AuthorOptions;
+  numberOfBooks?: AuthorSummary["numberOfBooks"];
+  amountOfSales?: AuthorSummary["amountOfSales"];
+}
 
 export function newAuthorSummary(options: AuthorSummaryOptions = {}, cache: Record<string, any> = {}): AuthorSummary {
   const o = (cache["AuthorSummary"] = {} as AuthorSummary);
@@ -278,7 +290,10 @@ function maybeNewOrNullAuthorSummary(
   }
 }
 
-export type BookOptions = DeepPartial<Book>;
+export interface BookOptions {
+  __typename?: "Book";
+  name?: Book["name"];
+}
 
 export function newBook(options: BookOptions = {}, cache: Record<string, any> = {}): Book {
   const o = (cache["Book"] = {} as Book);
@@ -307,7 +322,10 @@ function maybeNewOrNullBook(value: BookOptions | undefined | null, cache: Record
   }
 }
 
-export type SaveAuthorResultOptions = DeepPartial<SaveAuthorResult>;
+export interface SaveAuthorResultOptions {
+  __typename?: "SaveAuthorResult";
+  author?: AuthorOptions;
+}
 
 export function newSaveAuthorResult(
   options: SaveAuthorResultOptions = {},
@@ -345,17 +363,6 @@ function maybeNewOrNullSaveAuthorResult(
   }
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | undefined;
-type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
-
 let nextFactoryIds: Record<string, number> = {};
 
 export function resetFactoryIds() {
@@ -368,7 +375,11 @@ function nextFactoryId(objectName: string): string {
   return String(nextId);
 }
 
-export function newGetAuthorSummariesData(data: DeepPartial<GetAuthorSummariesQuery>) {
+interface GetAuthorSummariesDataOptions {
+  authorSummaries?: AuthorSummaryOptions[];
+}
+
+export function newGetAuthorSummariesData(data: GetAuthorSummariesDataOptions) {
   return {
     __typename: "Query" as const,
     authorSummaries: data["authorSummaries"]?.map((d) => newAuthorSummary(d)) || [],
@@ -376,7 +387,7 @@ export function newGetAuthorSummariesData(data: DeepPartial<GetAuthorSummariesQu
 }
 
 export function newGetAuthorSummariesResponse(
-  data: DeepPartial<GetAuthorSummariesQuery> | Error,
+  data: GetAuthorSummariesDataOptions | Error,
 ): MockedResponse<GetAuthorSummariesQueryVariables, GetAuthorSummariesQuery> {
   return {
     request: { query: GetAuthorSummariesDocument },
@@ -384,7 +395,11 @@ export function newGetAuthorSummariesResponse(
     error: data instanceof Error ? data : undefined,
   };
 }
-export function newSaveAuthorData(data: DeepPartial<SaveAuthorMutation>) {
+interface SaveAuthorDataOptions {
+  saveAuthor?: SaveAuthorResultOptions;
+}
+
+export function newSaveAuthorData(data: SaveAuthorDataOptions) {
   return {
     __typename: "Mutation" as const,
     saveAuthor: maybeNewSaveAuthorResult(data["saveAuthor"] || undefined, {}),
@@ -393,7 +408,7 @@ export function newSaveAuthorData(data: DeepPartial<SaveAuthorMutation>) {
 
 export function newSaveAuthorResponse(
   variables: SaveAuthorMutationVariables,
-  data: DeepPartial<SaveAuthorMutation> | Error,
+  data: SaveAuthorDataOptions | Error,
 ): MockedResponse<SaveAuthorMutationVariables, SaveAuthorMutation> {
   return {
     request: { query: SaveAuthorDocument, variables },
@@ -401,7 +416,11 @@ export function newSaveAuthorResponse(
     error: data instanceof Error ? data : undefined,
   };
 }
-export function newCurrentAuthorData(data: DeepPartial<CurrentAuthorQuery>) {
+interface CurrentAuthorDataOptions {
+  currentAuthor?: AuthorOptions | null;
+}
+
+export function newCurrentAuthorData(data: CurrentAuthorDataOptions) {
   return {
     __typename: "Query" as const,
     currentAuthor: maybeNewOrNullAuthor(data["currentAuthor"] || undefined, {}),
@@ -409,7 +428,7 @@ export function newCurrentAuthorData(data: DeepPartial<CurrentAuthorQuery>) {
 }
 
 export function newCurrentAuthorResponse(
-  data: DeepPartial<CurrentAuthorQuery> | Error,
+  data: CurrentAuthorDataOptions | Error,
 ): MockedResponse<CurrentAuthorQueryVariables, CurrentAuthorQuery> {
   return {
     request: { query: CurrentAuthorDocument },
