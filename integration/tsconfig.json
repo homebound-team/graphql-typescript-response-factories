@@ -2,13 +2,13 @@
   "compilerOptions": {
     "target": "es2018",
     "lib": ["esnext"],
+    "types": ["jest"],
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": false,
     "skipLibCheck": true,
-    "sourceMap": true,
-    "outDir": "build",
+    "noEmit": true,
     "jsx": "react"
   },
-  "include": ["src"]
+  "includes": ["."]
 }

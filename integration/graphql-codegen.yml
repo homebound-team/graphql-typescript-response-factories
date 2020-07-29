@@ -7,4 +7,5 @@ generates:
       - typescript
       - typescript-operations
       - typescript-react-apollo
-      - ./build/src/index.js
+      - "@homebound/graphql-typescript-factories"
+      - ./build/index.js
