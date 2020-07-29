@@ -63,6 +63,7 @@ export type Query = {
   authors: Array<Author>;
   authorSummaries: Array<AuthorSummary>;
   search: Array<SearchResult>;
+  currentAuthor?: Maybe<Author>;
 };
 
 
@@ -115,6 +116,17 @@ export type SaveAuthorMutation = (
       & Pick<Author, 'name'>
     ) }
   ) }
+);
+
+export type CurrentAuthorQueryVariables = {};
+
+
+export type CurrentAuthorQuery = (
+  { __typename?: 'Query' }
+  & { currentAuthor?: Maybe<(
+    { __typename?: 'Author' }
+    & Pick<Author, 'name'>
+  )> }
 );
 
 
@@ -174,6 +186,31 @@ export function withSaveAuthor<TProps, TChildProps = {}>(operationOptions?: Apol
 };
 export type SaveAuthorMutationResult = ApolloReactCommon.MutationResult<SaveAuthorMutation>;
 export type SaveAuthorMutationOptions = ApolloReactCommon.BaseMutationOptions<SaveAuthorMutation, SaveAuthorMutationVariables>;
+export const CurrentAuthorDocument = gql`
+    query CurrentAuthor {
+  currentAuthor {
+    name
+  }
+}
+    `;
+export type CurrentAuthorComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<CurrentAuthorQuery, CurrentAuthorQueryVariables>, 'query'>;
+
+    export const CurrentAuthorComponent = (props: CurrentAuthorComponentProps) => (
+      <ApolloReactComponents.Query<CurrentAuthorQuery, CurrentAuthorQueryVariables> query={CurrentAuthorDocument} {...props} />
+    );
+    
+export type CurrentAuthorProps<TChildProps = {}> = ApolloReactHoc.DataProps<CurrentAuthorQuery, CurrentAuthorQueryVariables> & TChildProps;
+export function withCurrentAuthor<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  CurrentAuthorQuery,
+  CurrentAuthorQueryVariables,
+  CurrentAuthorProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, CurrentAuthorQuery, CurrentAuthorQueryVariables, CurrentAuthorProps<TChildProps>>(CurrentAuthorDocument, {
+      alias: 'currentAuthor',
+      ...operationOptions
+    });
+};
+export type CurrentAuthorQueryResult = ApolloReactCommon.QueryResult<CurrentAuthorQuery, CurrentAuthorQueryVariables>;
 export type AuthorOptions = DeepPartial<Author>;
 
 export function newAuthor(options: AuthorOptions = {}, cache: Record<string, any> = {}): Author {
@@ -331,15 +368,15 @@ function nextFactoryId(objectName: string): string {
   return String(nextId);
 }
 
-export function newGetAuthorSummariesData(data: Omit<GetAuthorSummariesQuery, "__typename">) {
+export function newGetAuthorSummariesData(data: DeepPartial<GetAuthorSummariesQuery>) {
   return {
     __typename: "Query" as const,
-    authorSummaries: data["authorSummaries"].map(d => newAuthorSummary(d)),
+    authorSummaries: data["authorSummaries"]?.map((d) => newAuthorSummary(d)) || [],
   };
 }
 
 export function newGetAuthorSummariesResponse(
-  data: Omit<GetAuthorSummariesQuery, "__typename"> | Error,
+  data: DeepPartial<GetAuthorSummariesQuery> | Error,
 ): MockedResponse<GetAuthorSummariesQueryVariables, GetAuthorSummariesQuery> {
   return {
     request: { query: GetAuthorSummariesDocument },
@@ -347,20 +384,36 @@ export function newGetAuthorSummariesResponse(
     error: data instanceof Error ? data : undefined,
   };
 }
-export function newSaveAuthorData(data: Omit<SaveAuthorMutation, "__typename">) {
+export function newSaveAuthorData(data: DeepPartial<SaveAuthorMutation>) {
   return {
     __typename: "Mutation" as const,
-    saveAuthor: newSaveAuthorResult(data["saveAuthor"]),
+    saveAuthor: maybeNewSaveAuthorResult(data["saveAuthor"] || undefined, {}),
   };
 }
 
 export function newSaveAuthorResponse(
   variables: SaveAuthorMutationVariables,
-  data: Omit<SaveAuthorMutation, "__typename"> | Error,
+  data: DeepPartial<SaveAuthorMutation> | Error,
 ): MockedResponse<SaveAuthorMutationVariables, SaveAuthorMutation> {
   return {
     request: { query: SaveAuthorDocument, variables },
     result: { data: data instanceof Error ? undefined : newSaveAuthorData(data) },
+    error: data instanceof Error ? data : undefined,
+  };
+}
+export function newCurrentAuthorData(data: DeepPartial<CurrentAuthorQuery>) {
+  return {
+    __typename: "Query" as const,
+    currentAuthor: maybeNewOrNullAuthor(data["currentAuthor"] || undefined, {}),
+  };
+}
+
+export function newCurrentAuthorResponse(
+  data: DeepPartial<CurrentAuthorQuery> | Error,
+): MockedResponse<CurrentAuthorQueryVariables, CurrentAuthorQuery> {
+  return {
+    request: { query: CurrentAuthorDocument },
+    result: { data: data instanceof Error ? undefined : newCurrentAuthorData(data) },
     error: data instanceof Error ? data : undefined,
   };
 }

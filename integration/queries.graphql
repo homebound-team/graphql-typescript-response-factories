@@ -12,3 +12,9 @@ mutation SaveAuthor($input: AuthorInput!) {
     }
   }
 }
+
+query CurrentAuthor {
+  currentAuthor {
+    name
+  }
+}

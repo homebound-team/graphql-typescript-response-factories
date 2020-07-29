@@ -29,6 +29,7 @@ type Query {
   authors(id: ID): [Author!]!
   authorSummaries: [AuthorSummary!]!
   search(query: String!): [SearchResult!]!
+  currentAuthor: Author
 }
 
 type Mutation {

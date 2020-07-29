@@ -13,9 +13,9 @@ import PluginOutput = Types.PluginOutput;
 /** Generates `newQueryResponse({ ... })` factory functions in our `graphql-types` codegen output. */
 export const plugin: PluginFunction = async (schema, documents) => {
   const factories: Code[] = [];
-  documents.forEach((d) => {
+  documents.forEach(d => {
     if (d.document) {
-      d.document.definitions.forEach((d) => {
+      d.document.definitions.forEach(d => {
         if (d.kind === "OperationDefinition" && d.name) {
           factories.push(newOperationFactory(schema, d));
         }
@@ -32,10 +32,10 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
   const operation = `${def.operation.charAt(0).toUpperCase()}${def.operation.slice(1)}`;
   const rootType = operation === "Query" ? schema.getQueryType() : schema.getMutationType();
   return code`
-    export function new${name}Data(data: Omit<${name}${operation}, "__typename">) {
+    export function new${name}Data(data: DeepPartial<${name}${operation}>) {
       return {
         __typename: "${operation}" as const,
-        ${def.selectionSet.selections.map((s) => {
+        ${def.selectionSet.selections.map(s => {
           // This is the top-level Mutation/Query result, so usually/basically always has a single
           // field like `saveAuthor: AuthorResult!` where we can use the existing `newAuthorResult` factory.
           if (s.kind === "Field") {
@@ -45,9 +45,10 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
               let type = maybeDenull(field.type);
               if (type instanceof GraphQLList) {
                 type = maybeDenull(type.ofType);
-                return `${name}: data["${name}"].map(d => new${(type as GraphQLObjectType).name}(d)),`;
+                return `${name}: data["${name}"]?.map(d => new${(type as GraphQLObjectType).name}(d)) || [],`;
               } else {
-                return `${name}: new${(type as GraphQLObjectType).name}(data["${name}"]),`;
+                const orNull = field.type instanceof GraphQLNonNull ? "" : "OrNull";
+                return `${name}: maybeNew${orNull}${(type as GraphQLObjectType).name}(data["${name}"] || undefined, {}),`;
               }
             }
           }
@@ -57,7 +58,7 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
 
     export function new${name}Response(
       ${hasVariables ? `variables: ${name}${operation}Variables,` : ""}
-      data: Omit<${name}${operation}, "__typename"> | Error
+      data: DeepPartial<${name}${operation}> | Error
     ): MockedResponse<${name}${operation}Variables, ${name}${operation}> {
       return {
         request: { query: ${name}Document, ${hasVariables ? "variables, " : ""} },
