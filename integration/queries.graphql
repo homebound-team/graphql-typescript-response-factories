@@ -18,3 +18,9 @@ query CurrentAuthor {
     name
   }
 }
+
+subscription AuthorSavedUpdate {
+  authorSaved {
+    name
+  }
+}

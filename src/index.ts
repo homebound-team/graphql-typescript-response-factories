@@ -13,9 +13,9 @@ import PluginOutput = Types.PluginOutput;
 /** Generates `newQueryResponse({ ... })` factory functions in our `graphql-types` codegen output. */
 export const plugin: PluginFunction = async (schema, documents) => {
   const factories: Code[] = [];
-  documents.forEach(d => {
+  documents.forEach((d) => {
     if (d.document) {
-      d.document.definitions.forEach(d => {
+      d.document.definitions.forEach((d) => {
         if (d.kind === "OperationDefinition" && d.name) {
           factories.push(newOperationFactory(schema, d));
         }
@@ -30,11 +30,15 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
   const name = def.name?.value;
   const hasVariables = (def.variableDefinitions?.length || 0) > 0;
   const operation = `${def.operation.charAt(0).toUpperCase()}${def.operation.slice(1)}`;
+  // TODO skip Subscription operations until we figure out how to support
+  if (operation === "Subscription") {
+    return code``;
+  }
   const rootType = operation === "Query" ? schema.getQueryType() : schema.getMutationType();
 
   return code`
     interface ${name}DataOptions {
-        ${def.selectionSet.selections.map(s => {
+        ${def.selectionSet.selections.map((s) => {
           if (s.kind === "Field") {
             const name = s.name.value;
             const field = rootType?.getFields()[name];
@@ -55,7 +59,7 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
     export function new${name}Data(data: ${name}DataOptions) {
       return {
         __typename: "${operation}" as const,
-        ${def.selectionSet.selections.map(s => {
+        ${def.selectionSet.selections.map((s) => {
           // This is the top-level Mutation/Query result, so usually/basically always has a single
           // field like `saveAuthor: AuthorResult!` where we can use the existing `newAuthorResult` factory.
           if (s.kind === "Field") {
