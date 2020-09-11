@@ -100,6 +100,8 @@ const mockedResponse = `
       data?: Q;
     };
     error?: Error;
+    // Note this only works if using Homebound's better-apollo-mocked-provider
+    requestedCount?: number;
   };
 `;
 
