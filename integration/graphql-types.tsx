@@ -391,7 +391,8 @@ export function newGetAuthorSummariesResponse(
 ): MockedResponse<GetAuthorSummariesQueryVariables, GetAuthorSummariesQuery> {
   return {
     request: { query: GetAuthorSummariesDocument },
-    result: { data: data instanceof Error ? undefined : newGetAuthorSummariesData(data) },
+    // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
+    result: { data: data instanceof Error ? undefined : (newGetAuthorSummariesData(data) as any) },
     error: data instanceof Error ? data : undefined,
   };
 }
@@ -412,7 +413,8 @@ export function newSaveAuthorResponse(
 ): MockedResponse<SaveAuthorMutationVariables, SaveAuthorMutation> {
   return {
     request: { query: SaveAuthorDocument, variables },
-    result: { data: data instanceof Error ? undefined : newSaveAuthorData(data) },
+    // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
+    result: { data: data instanceof Error ? undefined : (newSaveAuthorData(data) as any) },
     error: data instanceof Error ? data : undefined,
   };
 }
@@ -432,7 +434,8 @@ export function newCurrentAuthorResponse(
 ): MockedResponse<CurrentAuthorQueryVariables, CurrentAuthorQuery> {
   return {
     request: { query: CurrentAuthorDocument },
-    result: { data: data instanceof Error ? undefined : newCurrentAuthorData(data) },
+    // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
+    result: { data: data instanceof Error ? undefined : (newCurrentAuthorData(data) as any) },
     error: data instanceof Error ? data : undefined,
   };
 }
@@ -446,4 +449,6 @@ export function newCurrentAuthorResponse(
       data?: Q;
     };
     error?: Error;
+    // Note this only works if using Homebound's better-apollo-mocked-provider
+    requestedCount?: number;
   };
