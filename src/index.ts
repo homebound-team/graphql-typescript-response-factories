@@ -84,7 +84,8 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
     ): MockedResponse<${name}${operation}Variables, ${name}${operation}> {
       return {
         request: { query: ${name}Document, ${hasVariables ? "variables, " : ""} },
-        result: { data: data instanceof Error ? undefined : new${name}Data(data) },
+        // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
+        result: { data: data instanceof Error ? undefined : new${name}Data(data) as any },
         error: data instanceof Error ? data : undefined,
       };
     }`;
