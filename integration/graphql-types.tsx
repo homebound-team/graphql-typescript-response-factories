@@ -83,6 +83,17 @@ export type SaveAuthorResult = {
 
 export type SearchResult = Author | Book;
 
+export type Subscription = {
+   __typename?: 'Subscription';
+  authorSaved: Author;
+  bookSaved?: Maybe<Book>;
+};
+
+
+export type SubscriptionBookSavedArgs = {
+  startsWith?: Maybe<Scalars['String']>;
+};
+
 export enum Working {
   Yes = 'YES',
   No = 'NO'
@@ -127,6 +138,17 @@ export type CurrentAuthorQuery = (
     { __typename?: 'Author' }
     & Pick<Author, 'name'>
   )> }
+);
+
+export type AuthorSavedUpdateSubscriptionVariables = {};
+
+
+export type AuthorSavedUpdateSubscription = (
+  { __typename?: 'Subscription' }
+  & { authorSaved: (
+    { __typename?: 'Author' }
+    & Pick<Author, 'name'>
+  ) }
 );
 
 
@@ -211,6 +233,31 @@ export function withCurrentAuthor<TProps, TChildProps = {}>(operationOptions?: A
     });
 };
 export type CurrentAuthorQueryResult = ApolloReactCommon.QueryResult<CurrentAuthorQuery, CurrentAuthorQueryVariables>;
+export const AuthorSavedUpdateDocument = gql`
+    subscription AuthorSavedUpdate {
+  authorSaved {
+    name
+  }
+}
+    `;
+export type AuthorSavedUpdateComponentProps = Omit<ApolloReactComponents.SubscriptionComponentOptions<AuthorSavedUpdateSubscription, AuthorSavedUpdateSubscriptionVariables>, 'subscription'>;
+
+    export const AuthorSavedUpdateComponent = (props: AuthorSavedUpdateComponentProps) => (
+      <ApolloReactComponents.Subscription<AuthorSavedUpdateSubscription, AuthorSavedUpdateSubscriptionVariables> subscription={AuthorSavedUpdateDocument} {...props} />
+    );
+    
+export type AuthorSavedUpdateProps<TChildProps = {}> = ApolloReactHoc.DataProps<AuthorSavedUpdateSubscription, AuthorSavedUpdateSubscriptionVariables> & TChildProps;
+export function withAuthorSavedUpdate<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  AuthorSavedUpdateSubscription,
+  AuthorSavedUpdateSubscriptionVariables,
+  AuthorSavedUpdateProps<TChildProps>>) {
+    return ApolloReactHoc.withSubscription<TProps, AuthorSavedUpdateSubscription, AuthorSavedUpdateSubscriptionVariables, AuthorSavedUpdateProps<TChildProps>>(AuthorSavedUpdateDocument, {
+      alias: 'authorSavedUpdate',
+      ...operationOptions
+    });
+};
+export type AuthorSavedUpdateSubscriptionResult = ApolloReactCommon.SubscriptionResult<AuthorSavedUpdateSubscription>;
 export interface AuthorOptions {
   __typename?: "Author";
   name?: Author["name"];
@@ -360,6 +407,43 @@ function maybeNewOrNullSaveAuthorResult(
     return value as SaveAuthorResult;
   } else {
     return newSaveAuthorResult(value, cache);
+  }
+}
+
+export interface SubscriptionOptions {
+  __typename?: "Subscription";
+  authorSaved?: AuthorOptions;
+  bookSaved?: BookOptions;
+}
+
+export function newSubscription(options: SubscriptionOptions = {}, cache: Record<string, any> = {}): Subscription {
+  const o = (cache["Subscription"] = {} as Subscription);
+  o.__typename = "Subscription";
+  o.authorSaved = maybeNewAuthor(options.authorSaved, cache);
+  o.bookSaved = maybeNewOrNullBook(options.bookSaved, cache);
+  return o;
+}
+
+function maybeNewSubscription(value: SubscriptionOptions | undefined, cache: Record<string, any>): Subscription {
+  if (value === undefined) {
+    return (cache["Subscription"] as Subscription) ?? newSubscription({}, cache);
+  } else if (value.__typename) {
+    return value as Subscription;
+  } else {
+    return newSubscription(value, cache);
+  }
+}
+
+function maybeNewOrNullSubscription(
+  value: SubscriptionOptions | undefined | null,
+  cache: Record<string, any>,
+): Subscription | null {
+  if (!value) {
+    return null;
+  } else if (value.__typename) {
+    return value as Subscription;
+  } else {
+    return newSubscription(value, cache);
   }
 }
 

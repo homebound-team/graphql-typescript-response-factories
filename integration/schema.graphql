@@ -23,6 +23,7 @@ union SearchResult = Author | Book
 schema {
   query: Query
   mutation: Mutation
+  subscription: Subscription
 }
 
 type Query {
@@ -34,6 +35,11 @@ type Query {
 
 type Mutation {
   saveAuthor(input: AuthorInput!): SaveAuthorResult!
+}
+
+type Subscription {
+  authorSaved: Author!
+  bookSaved(startsWith: String): Book
 }
 
 type SaveAuthorResult {

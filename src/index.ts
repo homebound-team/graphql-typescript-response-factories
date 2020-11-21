@@ -30,6 +30,10 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
   const name = def.name?.value;
   const hasVariables = (def.variableDefinitions?.length || 0) > 0;
   const operation = `${def.operation.charAt(0).toUpperCase()}${def.operation.slice(1)}`;
+  // TODO skip Subscription operations until we figure out how to support
+  if (operation === "Subscription") {
+    return code``;
+  }
   const rootType = operation === "Query" ? schema.getQueryType() : schema.getMutationType();
 
   return code`
