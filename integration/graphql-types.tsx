@@ -1,10 +1,10 @@
-import gql from 'graphql-tag';
-import * as React from 'react';
-import * as ApolloReactCommon from '@apollo/react-common';
-import * as ApolloReactComponents from '@apollo/react-components';
-import * as ApolloReactHoc from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+const defaultOptions =  {}
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -15,9 +15,8 @@ export type Scalars = {
   Date: any;
 };
 
-/** An entity that will be a mapped typed */
 export type Author = {
-   __typename?: 'Author';
+  __typename?: 'Author';
   name: Scalars['String'];
   summary: AuthorSummary;
   popularity: Popularity;
@@ -29,22 +28,21 @@ export type AuthorInput = {
   name?: Maybe<Scalars['String']>;
 };
 
-/** A DTO that is just some fields */
 export type AuthorSummary = {
-   __typename?: 'AuthorSummary';
+  __typename?: 'AuthorSummary';
   author: Author;
   numberOfBooks: Scalars['Int'];
   amountOfSales?: Maybe<Scalars['Float']>;
 };
 
 export type Book = {
-   __typename?: 'Book';
+  __typename?: 'Book';
   name: Scalars['String'];
 };
 
 
 export type Mutation = {
-   __typename?: 'Mutation';
+  __typename?: 'Mutation';
   saveAuthor: SaveAuthorResult;
 };
 
@@ -59,7 +57,7 @@ export enum Popularity {
 }
 
 export type Query = {
-   __typename?: 'Query';
+  __typename?: 'Query';
   authors: Array<Author>;
   authorSummaries: Array<AuthorSummary>;
   search: Array<SearchResult>;
@@ -77,7 +75,7 @@ export type QuerySearchArgs = {
 };
 
 export type SaveAuthorResult = {
-   __typename?: 'SaveAuthorResult';
+  __typename?: 'SaveAuthorResult';
   author: Author;
 };
 
@@ -88,46 +86,22 @@ export enum Working {
   No = 'NO'
 }
 
-export type GetAuthorSummariesQueryVariables = {};
+export type GetAuthorSummariesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAuthorSummariesQuery = (
-  { __typename?: 'Query' }
-  & { authorSummaries: Array<(
-    { __typename?: 'AuthorSummary' }
-    & { author: (
-      { __typename?: 'Author' }
-      & Pick<Author, 'name'>
-    ) }
-  )> }
-);
+export type GetAuthorSummariesQuery = { __typename?: 'Query', authorSummaries: Array<{ __typename?: 'AuthorSummary', author: { __typename?: 'Author', name: string } }> };
 
-export type SaveAuthorMutationVariables = {
+export type SaveAuthorMutationVariables = Exact<{
   input: AuthorInput;
-};
+}>;
 
 
-export type SaveAuthorMutation = (
-  { __typename?: 'Mutation' }
-  & { saveAuthor: (
-    { __typename?: 'SaveAuthorResult' }
-    & { author: (
-      { __typename?: 'Author' }
-      & Pick<Author, 'name'>
-    ) }
-  ) }
-);
+export type SaveAuthorMutation = { __typename?: 'Mutation', saveAuthor: { __typename?: 'SaveAuthorResult', author: { __typename?: 'Author', name: string } } };
 
-export type CurrentAuthorQueryVariables = {};
+export type CurrentAuthorQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CurrentAuthorQuery = (
-  { __typename?: 'Query' }
-  & { currentAuthor?: Maybe<(
-    { __typename?: 'Author' }
-    & Pick<Author, 'name'>
-  )> }
-);
+export type CurrentAuthorQuery = { __typename?: 'Query', currentAuthor?: Maybe<{ __typename?: 'Author', name: string }> };
 
 
 export const GetAuthorSummariesDocument = gql`
@@ -139,24 +113,33 @@ export const GetAuthorSummariesDocument = gql`
   }
 }
     `;
-export type GetAuthorSummariesComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables>, 'query'>;
 
-    export const GetAuthorSummariesComponent = (props: GetAuthorSummariesComponentProps) => (
-      <ApolloReactComponents.Query<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables> query={GetAuthorSummariesDocument} {...props} />
-    );
-    
-export type GetAuthorSummariesProps<TChildProps = {}> = ApolloReactHoc.DataProps<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables> & TChildProps;
-export function withGetAuthorSummaries<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  GetAuthorSummariesQuery,
-  GetAuthorSummariesQueryVariables,
-  GetAuthorSummariesProps<TChildProps>>) {
-    return ApolloReactHoc.withQuery<TProps, GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables, GetAuthorSummariesProps<TChildProps>>(GetAuthorSummariesDocument, {
-      alias: 'getAuthorSummaries',
-      ...operationOptions
-    });
-};
-export type GetAuthorSummariesQueryResult = ApolloReactCommon.QueryResult<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables>;
+/**
+ * __useGetAuthorSummariesQuery__
+ *
+ * To run a query within a React component, call `useGetAuthorSummariesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAuthorSummariesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAuthorSummariesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetAuthorSummariesQuery(baseOptions?: Apollo.QueryHookOptions<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables>(GetAuthorSummariesDocument, options);
+      }
+export function useGetAuthorSummariesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables>(GetAuthorSummariesDocument, options);
+        }
+export type GetAuthorSummariesQueryHookResult = ReturnType<typeof useGetAuthorSummariesQuery>;
+export type GetAuthorSummariesLazyQueryHookResult = ReturnType<typeof useGetAuthorSummariesLazyQuery>;
+export type GetAuthorSummariesQueryResult = Apollo.QueryResult<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables>;
 export const SaveAuthorDocument = gql`
     mutation SaveAuthor($input: AuthorInput!) {
   saveAuthor(input: $input) {
@@ -166,26 +149,32 @@ export const SaveAuthorDocument = gql`
   }
 }
     `;
-export type SaveAuthorMutationFn = ApolloReactCommon.MutationFunction<SaveAuthorMutation, SaveAuthorMutationVariables>;
-export type SaveAuthorComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<SaveAuthorMutation, SaveAuthorMutationVariables>, 'mutation'>;
+export type SaveAuthorMutationFn = Apollo.MutationFunction<SaveAuthorMutation, SaveAuthorMutationVariables>;
 
-    export const SaveAuthorComponent = (props: SaveAuthorComponentProps) => (
-      <ApolloReactComponents.Mutation<SaveAuthorMutation, SaveAuthorMutationVariables> mutation={SaveAuthorDocument} {...props} />
-    );
-    
-export type SaveAuthorProps<TChildProps = {}> = ApolloReactHoc.MutateProps<SaveAuthorMutation, SaveAuthorMutationVariables> & TChildProps;
-export function withSaveAuthor<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  SaveAuthorMutation,
-  SaveAuthorMutationVariables,
-  SaveAuthorProps<TChildProps>>) {
-    return ApolloReactHoc.withMutation<TProps, SaveAuthorMutation, SaveAuthorMutationVariables, SaveAuthorProps<TChildProps>>(SaveAuthorDocument, {
-      alias: 'saveAuthor',
-      ...operationOptions
-    });
-};
-export type SaveAuthorMutationResult = ApolloReactCommon.MutationResult<SaveAuthorMutation>;
-export type SaveAuthorMutationOptions = ApolloReactCommon.BaseMutationOptions<SaveAuthorMutation, SaveAuthorMutationVariables>;
+/**
+ * __useSaveAuthorMutation__
+ *
+ * To run a mutation, you first call `useSaveAuthorMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveAuthorMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [saveAuthorMutation, { data, loading, error }] = useSaveAuthorMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSaveAuthorMutation(baseOptions?: Apollo.MutationHookOptions<SaveAuthorMutation, SaveAuthorMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SaveAuthorMutation, SaveAuthorMutationVariables>(SaveAuthorDocument, options);
+      }
+export type SaveAuthorMutationHookResult = ReturnType<typeof useSaveAuthorMutation>;
+export type SaveAuthorMutationResult = Apollo.MutationResult<SaveAuthorMutation>;
+export type SaveAuthorMutationOptions = Apollo.BaseMutationOptions<SaveAuthorMutation, SaveAuthorMutationVariables>;
 export const CurrentAuthorDocument = gql`
     query CurrentAuthor {
   currentAuthor {
@@ -193,24 +182,33 @@ export const CurrentAuthorDocument = gql`
   }
 }
     `;
-export type CurrentAuthorComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<CurrentAuthorQuery, CurrentAuthorQueryVariables>, 'query'>;
 
-    export const CurrentAuthorComponent = (props: CurrentAuthorComponentProps) => (
-      <ApolloReactComponents.Query<CurrentAuthorQuery, CurrentAuthorQueryVariables> query={CurrentAuthorDocument} {...props} />
-    );
-    
-export type CurrentAuthorProps<TChildProps = {}> = ApolloReactHoc.DataProps<CurrentAuthorQuery, CurrentAuthorQueryVariables> & TChildProps;
-export function withCurrentAuthor<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  CurrentAuthorQuery,
-  CurrentAuthorQueryVariables,
-  CurrentAuthorProps<TChildProps>>) {
-    return ApolloReactHoc.withQuery<TProps, CurrentAuthorQuery, CurrentAuthorQueryVariables, CurrentAuthorProps<TChildProps>>(CurrentAuthorDocument, {
-      alias: 'currentAuthor',
-      ...operationOptions
-    });
-};
-export type CurrentAuthorQueryResult = ApolloReactCommon.QueryResult<CurrentAuthorQuery, CurrentAuthorQueryVariables>;
+/**
+ * __useCurrentAuthorQuery__
+ *
+ * To run a query within a React component, call `useCurrentAuthorQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCurrentAuthorQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCurrentAuthorQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCurrentAuthorQuery(baseOptions?: Apollo.QueryHookOptions<CurrentAuthorQuery, CurrentAuthorQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CurrentAuthorQuery, CurrentAuthorQueryVariables>(CurrentAuthorDocument, options);
+      }
+export function useCurrentAuthorLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CurrentAuthorQuery, CurrentAuthorQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CurrentAuthorQuery, CurrentAuthorQueryVariables>(CurrentAuthorDocument, options);
+        }
+export type CurrentAuthorQueryHookResult = ReturnType<typeof useCurrentAuthorQuery>;
+export type CurrentAuthorLazyQueryHookResult = ReturnType<typeof useCurrentAuthorLazyQuery>;
+export type CurrentAuthorQueryResult = Apollo.QueryResult<CurrentAuthorQuery, CurrentAuthorQueryVariables>;
 export interface AuthorOptions {
   __typename?: "Author";
   name?: Author["name"];
@@ -224,16 +222,16 @@ export function newAuthor(options: AuthorOptions = {}, cache: Record<string, any
   const o = (cache["Author"] = {} as Author);
   o.__typename = "Author";
   o.name = options.name ?? "name";
-  o.summary = maybeNewAuthorSummary(options.summary, cache);
+  o.summary = maybeNewAuthorSummary(options.summary, cache, options.hasOwnProperty("summary"));
   o.popularity = options.popularity ?? Popularity.Low;
   o.working = options.working ?? null;
   o.birthday = options.birthday ?? null;
   return o;
 }
 
-function maybeNewAuthor(value: AuthorOptions | undefined, cache: Record<string, any>): Author {
+function maybeNewAuthor(value: AuthorOptions | undefined, cache: Record<string, any>, isSet: boolean = false): Author {
   if (value === undefined) {
-    return (cache["Author"] as Author) ?? newAuthor({}, cache);
+    return isSet ? undefined : cache["Author"] || newAuthor({}, cache);
   } else if (value.__typename) {
     return value as Author;
   } else {
@@ -250,7 +248,6 @@ function maybeNewOrNullAuthor(value: AuthorOptions | undefined | null, cache: Re
     return newAuthor(value, cache);
   }
 }
-
 export interface AuthorSummaryOptions {
   __typename?: "AuthorSummary";
   author?: AuthorOptions;
@@ -261,15 +258,19 @@ export interface AuthorSummaryOptions {
 export function newAuthorSummary(options: AuthorSummaryOptions = {}, cache: Record<string, any> = {}): AuthorSummary {
   const o = (cache["AuthorSummary"] = {} as AuthorSummary);
   o.__typename = "AuthorSummary";
-  o.author = maybeNewAuthor(options.author, cache);
+  o.author = maybeNewAuthor(options.author, cache, options.hasOwnProperty("author"));
   o.numberOfBooks = options.numberOfBooks ?? 0;
   o.amountOfSales = options.amountOfSales ?? null;
   return o;
 }
 
-function maybeNewAuthorSummary(value: AuthorSummaryOptions | undefined, cache: Record<string, any>): AuthorSummary {
+function maybeNewAuthorSummary(
+  value: AuthorSummaryOptions | undefined,
+  cache: Record<string, any>,
+  isSet: boolean = false,
+): AuthorSummary {
   if (value === undefined) {
-    return (cache["AuthorSummary"] as AuthorSummary) ?? newAuthorSummary({}, cache);
+    return isSet ? undefined : cache["AuthorSummary"] || newAuthorSummary({}, cache);
   } else if (value.__typename) {
     return value as AuthorSummary;
   } else {
@@ -289,7 +290,6 @@ function maybeNewOrNullAuthorSummary(
     return newAuthorSummary(value, cache);
   }
 }
-
 export interface BookOptions {
   __typename?: "Book";
   name?: Book["name"];
@@ -302,9 +302,9 @@ export function newBook(options: BookOptions = {}, cache: Record<string, any> = 
   return o;
 }
 
-function maybeNewBook(value: BookOptions | undefined, cache: Record<string, any>): Book {
+function maybeNewBook(value: BookOptions | undefined, cache: Record<string, any>, isSet: boolean = false): Book {
   if (value === undefined) {
-    return (cache["Book"] as Book) ?? newBook({}, cache);
+    return isSet ? undefined : cache["Book"] || newBook({}, cache);
   } else if (value.__typename) {
     return value as Book;
   } else {
@@ -321,7 +321,6 @@ function maybeNewOrNullBook(value: BookOptions | undefined | null, cache: Record
     return newBook(value, cache);
   }
 }
-
 export interface SaveAuthorResultOptions {
   __typename?: "SaveAuthorResult";
   author?: AuthorOptions;
@@ -333,16 +332,17 @@ export function newSaveAuthorResult(
 ): SaveAuthorResult {
   const o = (cache["SaveAuthorResult"] = {} as SaveAuthorResult);
   o.__typename = "SaveAuthorResult";
-  o.author = maybeNewAuthor(options.author, cache);
+  o.author = maybeNewAuthor(options.author, cache, options.hasOwnProperty("author"));
   return o;
 }
 
 function maybeNewSaveAuthorResult(
   value: SaveAuthorResultOptions | undefined,
   cache: Record<string, any>,
+  isSet: boolean = false,
 ): SaveAuthorResult {
   if (value === undefined) {
-    return (cache["SaveAuthorResult"] as SaveAuthorResult) ?? newSaveAuthorResult({}, cache);
+    return isSet ? undefined : cache["SaveAuthorResult"] || newSaveAuthorResult({}, cache);
   } else if (value.__typename) {
     return value as SaveAuthorResult;
   } else {
@@ -362,7 +362,6 @@ function maybeNewOrNullSaveAuthorResult(
     return newSaveAuthorResult(value, cache);
   }
 }
-
 let nextFactoryIds: Record<string, number> = {};
 
 export function resetFactoryIds() {
