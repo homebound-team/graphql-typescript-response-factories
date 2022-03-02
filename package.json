@@ -5,6 +5,7 @@
   "types": "./build/",
   "scripts": {
     "build": "rm -rf build; ./node_modules/.bin/tsc",
+    "test": "jest",
     "prepare": "npm run build",
     "format": "prettier --write 'src/**/*.{ts,js,tsx,jsx}'",
     "graphql-codegen": "graphql-codegen --config ./integration/graphql-codegen.yml"
