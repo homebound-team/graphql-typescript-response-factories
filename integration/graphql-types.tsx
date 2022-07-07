@@ -15,7 +15,7 @@ export type Scalars = {
   Date: any;
 };
 
-export type Author = {
+export type Author = AuthorLike & {
   __typename?: 'Author';
   name: Scalars['String'];
   summary: AuthorSummary;
@@ -26,6 +26,10 @@ export type Author = {
 
 export type AuthorInput = {
   name?: Maybe<Scalars['String']>;
+};
+
+export type AuthorLike = {
+  name: Scalars['String'];
 };
 
 export type AuthorSummary = {
@@ -44,10 +48,16 @@ export type Book = {
 export type Mutation = {
   __typename?: 'Mutation';
   saveAuthor: SaveAuthorResult;
+  saveAuthorLike: Array<AuthorLike>;
 };
 
 
 export type MutationSaveAuthorArgs = {
+  input: AuthorInput;
+};
+
+
+export type MutationSaveAuthorLikeArgs = {
   input: AuthorInput;
 };
 
@@ -74,6 +84,11 @@ export type QuerySearchArgs = {
   query: Scalars['String'];
 };
 
+export type SaveAuthorLikeResult = {
+  __typename?: 'SaveAuthorLikeResult';
+  authors: Array<AuthorLike>;
+};
+
 export type SaveAuthorResult = {
   __typename?: 'SaveAuthorResult';
   author: Author;
@@ -97,6 +112,13 @@ export type SaveAuthorMutationVariables = Exact<{
 
 
 export type SaveAuthorMutation = { __typename?: 'Mutation', saveAuthor: { __typename?: 'SaveAuthorResult', author: { __typename?: 'Author', name: string } } };
+
+export type SaveAuthorLikeMutationVariables = Exact<{
+  input: AuthorInput;
+}>;
+
+
+export type SaveAuthorLikeMutation = { __typename?: 'Mutation', saveAuthorLike: Array<{ __typename?: 'Author', name: string }> };
 
 export type CurrentAuthorQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -175,6 +197,39 @@ export function useSaveAuthorMutation(baseOptions?: Apollo.MutationHookOptions<S
 export type SaveAuthorMutationHookResult = ReturnType<typeof useSaveAuthorMutation>;
 export type SaveAuthorMutationResult = Apollo.MutationResult<SaveAuthorMutation>;
 export type SaveAuthorMutationOptions = Apollo.BaseMutationOptions<SaveAuthorMutation, SaveAuthorMutationVariables>;
+export const SaveAuthorLikeDocument = gql`
+    mutation SaveAuthorLike($input: AuthorInput!) {
+  saveAuthorLike(input: $input) {
+    name
+  }
+}
+    `;
+export type SaveAuthorLikeMutationFn = Apollo.MutationFunction<SaveAuthorLikeMutation, SaveAuthorLikeMutationVariables>;
+
+/**
+ * __useSaveAuthorLikeMutation__
+ *
+ * To run a mutation, you first call `useSaveAuthorLikeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveAuthorLikeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [saveAuthorLikeMutation, { data, loading, error }] = useSaveAuthorLikeMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSaveAuthorLikeMutation(baseOptions?: Apollo.MutationHookOptions<SaveAuthorLikeMutation, SaveAuthorLikeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SaveAuthorLikeMutation, SaveAuthorLikeMutationVariables>(SaveAuthorLikeDocument, options);
+      }
+export type SaveAuthorLikeMutationHookResult = ReturnType<typeof useSaveAuthorLikeMutation>;
+export type SaveAuthorLikeMutationResult = Apollo.MutationResult<SaveAuthorLikeMutation>;
+export type SaveAuthorLikeMutationOptions = Apollo.BaseMutationOptions<SaveAuthorLikeMutation, SaveAuthorLikeMutationVariables>;
 export const CurrentAuthorDocument = gql`
     query CurrentAuthor {
   currentAuthor {
@@ -321,6 +376,47 @@ function maybeNewOrNullBook(value: BookOptions | undefined | null, cache: Record
     return newBook(value, cache);
   }
 }
+export interface SaveAuthorLikeResultOptions {
+  __typename?: "SaveAuthorLikeResult";
+  authors?: SaveAuthorLikeResult["authors"];
+}
+
+export function newSaveAuthorLikeResult(
+  options: SaveAuthorLikeResultOptions = {},
+  cache: Record<string, any> = {},
+): SaveAuthorLikeResult {
+  const o = (cache["SaveAuthorLikeResult"] = {} as SaveAuthorLikeResult);
+  o.__typename = "SaveAuthorLikeResult";
+  o.authors = options.authors ?? [];
+  return o;
+}
+
+function maybeNewSaveAuthorLikeResult(
+  value: SaveAuthorLikeResultOptions | undefined,
+  cache: Record<string, any>,
+  isSet: boolean = false,
+): SaveAuthorLikeResult {
+  if (value === undefined) {
+    return isSet ? undefined : cache["SaveAuthorLikeResult"] || newSaveAuthorLikeResult({}, cache);
+  } else if (value.__typename) {
+    return value as SaveAuthorLikeResult;
+  } else {
+    return newSaveAuthorLikeResult(value, cache);
+  }
+}
+
+function maybeNewOrNullSaveAuthorLikeResult(
+  value: SaveAuthorLikeResultOptions | undefined | null,
+  cache: Record<string, any>,
+): SaveAuthorLikeResult | null {
+  if (!value) {
+    return null;
+  } else if (value.__typename) {
+    return value as SaveAuthorLikeResult;
+  } else {
+    return newSaveAuthorLikeResult(value, cache);
+  }
+}
 export interface SaveAuthorResultOptions {
   __typename?: "SaveAuthorResult";
   author?: AuthorOptions;
@@ -362,6 +458,35 @@ function maybeNewOrNullSaveAuthorResult(
     return newSaveAuthorResult(value, cache);
   }
 }
+export type AuthorLikeOptions = AuthorOptions;
+
+export type AuthorLikeType = Author;
+
+export type AuthorLikeTypeName = "Author";
+
+function maybeNewAuthorLike(value: AuthorLikeOptions | undefined, cache: Record<string, any>): AuthorLikeType {
+  if (value === undefined) {
+    return cache["Author"] || newAuthor({}, cache);
+  } else if (value.__typename) {
+    return value as AuthorLikeType;
+  } else {
+    return newAuthor(value as unknown as AuthorOptions, cache);
+  }
+}
+
+function maybeNewOrNullAuthorLike(
+  value: AuthorLikeOptions | undefined | null,
+  cache: Record<string, any>,
+): AuthorLike | null {
+  if (!value) {
+    return null;
+  } else if (value.__typename) {
+    return value as AuthorLikeType;
+  } else {
+    return newAuthor(value as unknown as AuthorOptions, cache);
+  }
+}
+
 let nextFactoryIds: Record<string, number> = {};
 
 export function resetFactoryIds() {
@@ -414,6 +539,28 @@ export function newSaveAuthorResponse(
     request: { query: SaveAuthorDocument, variables },
     // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
     result: { data: data instanceof Error ? undefined : (newSaveAuthorData(data) as any) },
+    error: data instanceof Error ? data : undefined,
+  };
+}
+interface SaveAuthorLikeDataOptions {
+  saveAuthorLike?: AuthorLikeOptions[];
+}
+
+export function newSaveAuthorLikeData(data: SaveAuthorLikeDataOptions) {
+  return {
+    __typename: "Mutation" as const,
+    saveAuthorLike: data["saveAuthorLike"]?.map((d) => maybeNewAuthorLike(d, {})) || [],
+  };
+}
+
+export function newSaveAuthorLikeResponse(
+  variables: SaveAuthorLikeMutationVariables,
+  data: SaveAuthorLikeDataOptions | Error,
+): MockedResponse<SaveAuthorLikeMutationVariables, SaveAuthorLikeMutation> {
+  return {
+    request: { query: SaveAuthorLikeDocument, variables },
+    // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
+    result: { data: data instanceof Error ? undefined : (newSaveAuthorLikeData(data) as any) },
     error: data instanceof Error ? data : undefined,
   };
 }

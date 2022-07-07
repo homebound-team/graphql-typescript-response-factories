@@ -5,11 +5,18 @@ query GetAuthorSummaries {
     }
   }
 }
+
 mutation SaveAuthor($input: AuthorInput!) {
   saveAuthor(input: $input) {
     author {
       name
     }
+  }
+}
+
+mutation SaveAuthorLike($input: AuthorInput!) {
+  saveAuthorLike(input: $input) {
+    name
   }
 }
 
