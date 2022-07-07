@@ -3,6 +3,7 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
+  GraphQLInterfaceType,
   GraphQLOutputType,
   GraphQLSchema,
   OperationDefinitionNode,
@@ -65,7 +66,13 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
               let type = maybeDenull(field.type);
               if (type instanceof GraphQLList) {
                 type = maybeDenull(type.ofType);
-                return `${name}: data["${name}"]?.map(d => new${(type as GraphQLObjectType).name}(d)) || [],`;
+                if (type instanceof GraphQLInterfaceType) {
+                  return `${name}: data["${name}"]?.map(d => maybeNew${type.name}(d, {})) || [],`;
+                } else if (type instanceof GraphQLObjectType) {
+                  return `${name}: data["${name}"]?.map(d => new${type.name}(d)) || [],`;
+                } else {
+                  throw new Error(`Unsupported return type ${type}`);
+                }
               } else {
                 const orNull = field.type instanceof GraphQLNonNull ? "" : "OrNull";
                 return `${name}: maybeNew${orNull}${

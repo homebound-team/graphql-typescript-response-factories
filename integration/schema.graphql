@@ -1,5 +1,5 @@
 # An entity that will be a mapped typed
-type Author {
+type Author implements AuthorLike {
   name: String!
   summary: AuthorSummary!
   popularity: Popularity!
@@ -34,10 +34,20 @@ type Query {
 
 type Mutation {
   saveAuthor(input: AuthorInput!): SaveAuthorResult!
+  # Example returning an array of interfaces
+  saveAuthorLike(input: AuthorInput!): [AuthorLike!]!
 }
 
 type SaveAuthorResult {
   author: Author!
+}
+
+type SaveAuthorLikeResult {
+  authors: [AuthorLike!]!
+}
+
+interface AuthorLike {
+  name: String!
 }
 
 input AuthorInput {
