@@ -17,11 +17,11 @@ export type Scalars = {
 
 export type Author = AuthorLike & {
   __typename?: 'Author';
-  name: Scalars['String'];
-  summary: AuthorSummary;
-  popularity: Popularity;
-  working?: Maybe<Working>;
   birthday?: Maybe<Scalars['Date']>;
+  name: Scalars['String'];
+  popularity: Popularity;
+  summary: AuthorSummary;
+  working?: Maybe<Working>;
 };
 
 export type AuthorInput = {
@@ -34,9 +34,9 @@ export type AuthorLike = {
 
 export type AuthorSummary = {
   __typename?: 'AuthorSummary';
+  amountOfSales?: Maybe<Scalars['Float']>;
   author: Author;
   numberOfBooks: Scalars['Int'];
-  amountOfSales?: Maybe<Scalars['Float']>;
 };
 
 export type Book = {
@@ -62,16 +62,16 @@ export type MutationSaveAuthorLikeArgs = {
 };
 
 export enum Popularity {
-  Low = 'Low',
-  High = 'High'
+  High = 'High',
+  Low = 'Low'
 }
 
 export type Query = {
   __typename?: 'Query';
-  authors: Array<Author>;
   authorSummaries: Array<AuthorSummary>;
-  search: Array<SearchResult>;
+  authors: Array<Author>;
   currentAuthor?: Maybe<Author>;
+  search: Array<SearchResult>;
 };
 
 
@@ -97,8 +97,8 @@ export type SaveAuthorResult = {
 export type SearchResult = Author | Book;
 
 export enum Working {
-  Yes = 'YES',
-  No = 'NO'
+  No = 'NO',
+  Yes = 'YES'
 }
 
 export type GetAuthorSummariesQueryVariables = Exact<{ [key: string]: never; }>;
@@ -266,21 +266,21 @@ export type CurrentAuthorLazyQueryHookResult = ReturnType<typeof useCurrentAutho
 export type CurrentAuthorQueryResult = Apollo.QueryResult<CurrentAuthorQuery, CurrentAuthorQueryVariables>;
 export interface AuthorOptions {
   __typename?: "Author";
-  name?: Author["name"];
-  summary?: AuthorSummaryOptions;
-  popularity?: Author["popularity"];
-  working?: Author["working"];
   birthday?: Author["birthday"];
+  name?: Author["name"];
+  popularity?: Author["popularity"];
+  summary?: AuthorSummaryOptions;
+  working?: Author["working"];
 }
 
 export function newAuthor(options: AuthorOptions = {}, cache: Record<string, any> = {}): Author {
   const o = (cache["Author"] = {} as Author);
   o.__typename = "Author";
-  o.name = options.name ?? "name";
-  o.summary = maybeNewAuthorSummary(options.summary, cache, options.hasOwnProperty("summary"));
-  o.popularity = options.popularity ?? Popularity.Low;
-  o.working = options.working ?? null;
   o.birthday = options.birthday ?? null;
+  o.name = options.name ?? "name";
+  o.popularity = options.popularity ?? Popularity.High;
+  o.summary = maybeNewAuthorSummary(options.summary, cache, options.hasOwnProperty("summary"));
+  o.working = options.working ?? null;
   return o;
 }
 
@@ -305,17 +305,17 @@ function maybeNewOrNullAuthor(value: AuthorOptions | undefined | null, cache: Re
 }
 export interface AuthorSummaryOptions {
   __typename?: "AuthorSummary";
+  amountOfSales?: AuthorSummary["amountOfSales"];
   author?: AuthorOptions;
   numberOfBooks?: AuthorSummary["numberOfBooks"];
-  amountOfSales?: AuthorSummary["amountOfSales"];
 }
 
 export function newAuthorSummary(options: AuthorSummaryOptions = {}, cache: Record<string, any> = {}): AuthorSummary {
   const o = (cache["AuthorSummary"] = {} as AuthorSummary);
   o.__typename = "AuthorSummary";
+  o.amountOfSales = options.amountOfSales ?? null;
   o.author = maybeNewAuthor(options.author, cache, options.hasOwnProperty("author"));
   o.numberOfBooks = options.numberOfBooks ?? 0;
-  o.amountOfSales = options.amountOfSales ?? null;
   return o;
 }
 
@@ -506,7 +506,8 @@ interface GetAuthorSummariesDataOptions {
 export function newGetAuthorSummariesData(data: GetAuthorSummariesDataOptions) {
   return {
     __typename: "Query" as const,
-    authorSummaries: data["authorSummaries"]?.map((d) => newAuthorSummary(d)) || [],
+    authorSummaries: data["authorSummaries"]?.map((d) => newAuthorSummary(d)) ||
+      [],
   };
 }
 
@@ -516,7 +517,11 @@ export function newGetAuthorSummariesResponse(
   return {
     request: { query: GetAuthorSummariesDocument },
     // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
-    result: { data: data instanceof Error ? undefined : (newGetAuthorSummariesData(data) as any) },
+    result: {
+      data: data instanceof Error
+        ? undefined
+        : newGetAuthorSummariesData(data) as any,
+    },
     error: data instanceof Error ? data : undefined,
   };
 }
@@ -538,7 +543,9 @@ export function newSaveAuthorResponse(
   return {
     request: { query: SaveAuthorDocument, variables },
     // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
-    result: { data: data instanceof Error ? undefined : (newSaveAuthorData(data) as any) },
+    result: {
+      data: data instanceof Error ? undefined : newSaveAuthorData(data) as any,
+    },
     error: data instanceof Error ? data : undefined,
   };
 }
@@ -549,7 +556,8 @@ interface SaveAuthorLikeDataOptions {
 export function newSaveAuthorLikeData(data: SaveAuthorLikeDataOptions) {
   return {
     __typename: "Mutation" as const,
-    saveAuthorLike: data["saveAuthorLike"]?.map((d) => maybeNewAuthorLike(d, {})) || [],
+    saveAuthorLike:
+      data["saveAuthorLike"]?.map((d) => maybeNewAuthorLike(d, {})) || [],
   };
 }
 
@@ -560,7 +568,11 @@ export function newSaveAuthorLikeResponse(
   return {
     request: { query: SaveAuthorLikeDocument, variables },
     // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
-    result: { data: data instanceof Error ? undefined : (newSaveAuthorLikeData(data) as any) },
+    result: {
+      data: data instanceof Error
+        ? undefined
+        : newSaveAuthorLikeData(data) as any,
+    },
     error: data instanceof Error ? data : undefined,
   };
 }
@@ -581,7 +593,11 @@ export function newCurrentAuthorResponse(
   return {
     request: { query: CurrentAuthorDocument },
     // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
-    result: { data: data instanceof Error ? undefined : (newCurrentAuthorData(data) as any) },
+    result: {
+      data: data instanceof Error
+        ? undefined
+        : newCurrentAuthorData(data) as any,
+    },
     error: data instanceof Error ? data : undefined,
   };
 }
