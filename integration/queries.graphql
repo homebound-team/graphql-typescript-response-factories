@@ -25,3 +25,12 @@ query CurrentAuthor {
     name
   }
 }
+
+query MultipleAuthors {
+  authorOne: currentAuthor {
+    name
+  }
+  authorTwo: currentAuthor {
+    name
+  }
+}

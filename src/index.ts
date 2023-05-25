@@ -38,15 +38,16 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
         ${def.selectionSet.selections.map((s) => {
           if (s.kind === "Field") {
             const name = s.name.value;
+            const key = s.alias?.value || name;
             const field = rootType?.getFields()[name];
             if (field) {
               let type = maybeDenull(field.type);
               if (type instanceof GraphQLList) {
                 type = maybeDenull(type.ofType);
-                return `${name}?: ${(type as any).name}Options[];`;
+                return `${key}?: ${(type as any).name}Options[];`;
               } else {
                 const orNull = field.type instanceof GraphQLNonNull ? "" : " | null";
-                return `${name}?: ${(type as GraphQLObjectType).name}Options${orNull};`;
+                return `${key}?: ${(type as GraphQLObjectType).name}Options${orNull};`;
               }
             }
           }
@@ -61,23 +62,22 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
           // field like `saveAuthor: AuthorResult!` where we can use the existing `newAuthorResult` factory.
           if (s.kind === "Field") {
             const name = s.name.value;
+            const key = s.alias?.value || name;
             const field = rootType?.getFields()[name];
             if (field) {
               let type = maybeDenull(field.type);
               if (type instanceof GraphQLList) {
                 type = maybeDenull(type.ofType);
                 if (type instanceof GraphQLInterfaceType) {
-                  return `${name}: data["${name}"]?.map(d => maybeNew${type.name}(d, {})) || [],`;
+                  return `${key}: data["${key}"]?.map(d => maybeNew${type.name}(d, {})) || [],`;
                 } else if (type instanceof GraphQLObjectType) {
-                  return `${name}: data["${name}"]?.map(d => new${type.name}(d)) || [],`;
+                  return `${key}: data["${key}"]?.map(d => new${type.name}(d)) || [],`;
                 } else {
                   throw new Error(`Unsupported return type ${type}`);
                 }
               } else {
                 const orNull = field.type instanceof GraphQLNonNull ? "" : "OrNull";
-                return `${name}: maybeNew${orNull}${
-                  (type as GraphQLObjectType).name
-                }(data["${name}"] || undefined, {}),`;
+                return `${key}: maybeNew${orNull}${(type as GraphQLObjectType).name}(data["${key}"] || undefined, {}),`;
               }
             }
           }

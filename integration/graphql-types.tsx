@@ -125,6 +125,11 @@ export type CurrentAuthorQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type CurrentAuthorQuery = { __typename?: 'Query', currentAuthor?: Maybe<{ __typename?: 'Author', name: string }> };
 
+export type MultipleAuthorsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MultipleAuthorsQuery = { __typename?: 'Query', authorOne?: Maybe<{ __typename?: 'Author', name: string }>, authorTwo?: Maybe<{ __typename?: 'Author', name: string }> };
+
 
 export const GetAuthorSummariesDocument = gql`
     query GetAuthorSummaries {
@@ -264,6 +269,43 @@ export function useCurrentAuthorLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type CurrentAuthorQueryHookResult = ReturnType<typeof useCurrentAuthorQuery>;
 export type CurrentAuthorLazyQueryHookResult = ReturnType<typeof useCurrentAuthorLazyQuery>;
 export type CurrentAuthorQueryResult = Apollo.QueryResult<CurrentAuthorQuery, CurrentAuthorQueryVariables>;
+export const MultipleAuthorsDocument = gql`
+    query MultipleAuthors {
+  authorOne: currentAuthor {
+    name
+  }
+  authorTwo: currentAuthor {
+    name
+  }
+}
+    `;
+
+/**
+ * __useMultipleAuthorsQuery__
+ *
+ * To run a query within a React component, call `useMultipleAuthorsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMultipleAuthorsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMultipleAuthorsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMultipleAuthorsQuery(baseOptions?: Apollo.QueryHookOptions<MultipleAuthorsQuery, MultipleAuthorsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MultipleAuthorsQuery, MultipleAuthorsQueryVariables>(MultipleAuthorsDocument, options);
+      }
+export function useMultipleAuthorsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MultipleAuthorsQuery, MultipleAuthorsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MultipleAuthorsQuery, MultipleAuthorsQueryVariables>(MultipleAuthorsDocument, options);
+        }
+export type MultipleAuthorsQueryHookResult = ReturnType<typeof useMultipleAuthorsQuery>;
+export type MultipleAuthorsLazyQueryHookResult = ReturnType<typeof useMultipleAuthorsLazyQuery>;
+export type MultipleAuthorsQueryResult = Apollo.QueryResult<MultipleAuthorsQuery, MultipleAuthorsQueryVariables>;
 const factories: Record<string, Function> = {};
 export interface AuthorOptions {
   __typename?: "Author";
@@ -689,6 +731,33 @@ export function newCurrentAuthorResponse(
       data: data instanceof Error
         ? undefined
         : newCurrentAuthorData(data) as any,
+    },
+    error: data instanceof Error ? data : undefined,
+  };
+}
+interface MultipleAuthorsDataOptions {
+  authorOne?: AuthorOptions | null;
+  authorTwo?: AuthorOptions | null;
+}
+
+export function newMultipleAuthorsData(data: MultipleAuthorsDataOptions) {
+  return {
+    __typename: "Query" as const,
+    authorOne: maybeNewOrNullAuthor(data["authorOne"] || undefined, {}),
+    authorTwo: maybeNewOrNullAuthor(data["authorTwo"] || undefined, {}),
+  };
+}
+
+export function newMultipleAuthorsResponse(
+  data: MultipleAuthorsDataOptions | Error,
+): MockedResponse<MultipleAuthorsQueryVariables, MultipleAuthorsQuery> {
+  return {
+    request: { query: MultipleAuthorsDocument },
+    // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
+    result: {
+      data: data instanceof Error
+        ? undefined
+        : newMultipleAuthorsData(data) as any,
     },
     error: data instanceof Error ? data : undefined,
   };
