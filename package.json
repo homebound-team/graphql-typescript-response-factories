@@ -4,9 +4,9 @@
   "main": "./build/index.js",
   "types": "./build/",
   "scripts": {
-    "build": "rm -rf build; ./node_modules/.bin/tsc",
+    "build": "rm -rf build; tsc",
     "test": "jest",
-    "prepare": "npm run build",
+    "prepack": "yarn build",
     "format": "prettier --write 'src/**/*.{ts,js,tsx,jsx}'",
     "graphql-codegen": "graphql-codegen --config ./integration/graphql-codegen.yml"
   },
@@ -15,13 +15,13 @@
     "ts-poet": "^5.0.1"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^2.11.8",
     "@apollo/client": "^3.4.7",
+    "@graphql-codegen/cli": "^2.11.8",
+    "@graphql-codegen/typescript-operations": "^2.0.1",
+    "@graphql-codegen/typescript-react-apollo": "^3.0.0",
+    "@homebound/graphql-typescript-factories": "^2.50.0",
     "@types/jest": "^27.0.1",
     "@types/react": "^17.0.17",
-    "@graphql-codegen/typescript-react-apollo": "^3.0.0",
-    "@graphql-codegen/typescript-operations": "^2.0.1",
-    "@homebound/graphql-typescript-factories": "^2.50.0",
     "husky": "^3.0.9",
     "jest": "^27.0.6",
     "prettier": "^2.7.1",
@@ -32,7 +32,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run format"
+      "pre-commit": "yarn format"
     }
-  }
+  },
+  "packageManager": "yarn@3.6.3"
 }

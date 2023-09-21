@@ -1,4 +1,3 @@
-
 # graphql-typescript-response-factories
 
 This `graphql-code-generator` plugin generates factory methods for the react-apollo `MockedResponse`s that are used for testing client-side GraphQL code.
@@ -41,7 +40,7 @@ const response = newGetAuthorSummariesResponse({
 const component = render(
   <MockedProvider mocks={[response]}>
     <YourComponent />
-  </MockedProvider>
+  </MockedProvider>,
 );
 ```
 
@@ -56,7 +55,7 @@ For non-`react-apollo`-specific factories for the rest of your GraphQL schema's 
 ## Install
 
 ```shell
-npm -i @homebound/graphql-typescript-response-factories
+yarn add -D @homebound/graphql-typescript-response-factories
 ```
 
 Add the plugin to your `graphql-codegen.yml`, i.e.:
@@ -78,4 +77,3 @@ generates:
 ## License
 
 MIT
-
