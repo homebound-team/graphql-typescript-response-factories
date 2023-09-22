@@ -23,7 +23,7 @@ export const plugin: PluginFunction = async (schema, documents) => {
       });
     }
   });
-  const content = (await code`${factories}`.toStringWithImports()) + mockedResponse;
+  const content = (await code`${factories}`.toString()) + mockedResponse;
   return { content } as PluginOutput;
 };
 

@@ -1,49 +1,51 @@
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-const defaultOptions =  {}
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string;
-  String: string;
-  Boolean: boolean;
-  Int: number;
-  Float: number;
-  Date: any;
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
+  Date: { input: any; output: any; }
 };
 
 export type Author = AuthorLike & {
   __typename?: 'Author';
-  birthday?: Maybe<Scalars['Date']>;
-  name: Scalars['String'];
+  birthday?: Maybe<Scalars['Date']['output']>;
+  name: Scalars['String']['output'];
   popularity: Popularity;
   summary: AuthorSummary;
   working?: Maybe<Working>;
 };
 
 export type AuthorInput = {
-  name?: Maybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AuthorLike = {
-  name: Scalars['String'];
+  name: Scalars['String']['output'];
 };
 
 export type AuthorSummary = {
   __typename?: 'AuthorSummary';
-  amountOfSales?: Maybe<Scalars['Float']>;
+  amountOfSales?: Maybe<Scalars['Float']['output']>;
   author: Author;
-  numberOfBooks: Scalars['Int'];
+  numberOfBooks: Scalars['Int']['output'];
 };
 
 export type Book = {
   __typename?: 'Book';
-  name: Scalars['String'];
+  name: Scalars['String']['output'];
 };
-
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -76,12 +78,12 @@ export type Query = {
 
 
 export type QueryAuthorsArgs = {
-  id?: Maybe<Scalars['ID']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
 export type QuerySearchArgs = {
-  query: Scalars['String'];
+  query: Scalars['String']['input'];
 };
 
 export type SaveAuthorLikeResult = {
@@ -123,12 +125,12 @@ export type SaveAuthorLikeMutation = { __typename?: 'Mutation', saveAuthorLike: 
 export type CurrentAuthorQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CurrentAuthorQuery = { __typename?: 'Query', currentAuthor?: Maybe<{ __typename?: 'Author', name: string }> };
+export type CurrentAuthorQuery = { __typename?: 'Query', currentAuthor?: { __typename?: 'Author', name: string } | null };
 
 export type MultipleAuthorsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MultipleAuthorsQuery = { __typename?: 'Query', authorOne?: Maybe<{ __typename?: 'Author', name: string }>, authorTwo?: Maybe<{ __typename?: 'Author', name: string }> };
+export type MultipleAuthorsQuery = { __typename?: 'Query', authorOne?: { __typename?: 'Author', name: string } | null, authorTwo?: { __typename?: 'Author', name: string } | null };
 
 
 export const GetAuthorSummariesDocument = gql`
@@ -316,53 +318,35 @@ export interface AuthorOptions {
   working?: Author["working"];
 }
 
-export function newAuthor(
-  options: AuthorOptions = {},
-  cache: Record<string, any> = {},
-): Author {
+export function newAuthor(options: AuthorOptions = {}, cache: Record<string, any> = {}): Author {
   const o = (options.__typename ? options : cache["Author"] = {}) as Author;
   (cache.all ??= new Set()).add(o);
   o.__typename = "Author";
   o.birthday = options.birthday ?? null;
   o.name = options.name ?? "name";
   o.popularity = options.popularity ?? Popularity.High;
-  o.summary = maybeNewAuthorSummary(
-    options.summary,
-    cache,
-    options.hasOwnProperty("summary"),
-  );
+  o.summary = maybeNewAuthorSummary(options.summary, cache, options.hasOwnProperty("summary"));
   o.working = options.working ?? null;
   return o;
 }
 
 factories["Author"] = newAuthor;
 
-function maybeNewAuthor(
-  value: AuthorOptions | undefined,
-  cache: Record<string, any>,
-  isSet: boolean = false,
-): Author {
+function maybeNewAuthor(value: AuthorOptions | undefined, cache: Record<string, any>, isSet: boolean = false): Author {
   if (value === undefined) {
     return isSet ? undefined : cache["Author"] || newAuthor({}, cache);
   } else if (value.__typename) {
-    return cache.all?.has(value)
-      ? value
-      : factories[value.__typename](value, cache);
+    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
   } else {
     return newAuthor(value, cache);
   }
 }
 
-function maybeNewOrNullAuthor(
-  value: AuthorOptions | undefined | null,
-  cache: Record<string, any>,
-): Author | null {
+function maybeNewOrNullAuthor(value: AuthorOptions | undefined | null, cache: Record<string, any>): Author | null {
   if (!value) {
     return null;
   } else if (value.__typename) {
-    return cache.all?.has(value)
-      ? value
-      : factories[value.__typename](value, cache);
+    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
   } else {
     return newAuthor(value, cache);
   }
@@ -374,22 +358,12 @@ export interface AuthorSummaryOptions {
   numberOfBooks?: AuthorSummary["numberOfBooks"];
 }
 
-export function newAuthorSummary(
-  options: AuthorSummaryOptions = {},
-  cache: Record<string, any> = {},
-): AuthorSummary {
-  const o =
-    (options.__typename
-      ? options
-      : cache["AuthorSummary"] = {}) as AuthorSummary;
+export function newAuthorSummary(options: AuthorSummaryOptions = {}, cache: Record<string, any> = {}): AuthorSummary {
+  const o = (options.__typename ? options : cache["AuthorSummary"] = {}) as AuthorSummary;
   (cache.all ??= new Set()).add(o);
   o.__typename = "AuthorSummary";
   o.amountOfSales = options.amountOfSales ?? null;
-  o.author = maybeNewAuthor(
-    options.author,
-    cache,
-    options.hasOwnProperty("author"),
-  );
+  o.author = maybeNewAuthor(options.author, cache, options.hasOwnProperty("author"));
   o.numberOfBooks = options.numberOfBooks ?? 0;
   return o;
 }
@@ -402,13 +376,9 @@ function maybeNewAuthorSummary(
   isSet: boolean = false,
 ): AuthorSummary {
   if (value === undefined) {
-    return isSet
-      ? undefined
-      : cache["AuthorSummary"] || newAuthorSummary({}, cache);
+    return isSet ? undefined : cache["AuthorSummary"] || newAuthorSummary({}, cache);
   } else if (value.__typename) {
-    return cache.all?.has(value)
-      ? value
-      : factories[value.__typename](value, cache);
+    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
   } else {
     return newAuthorSummary(value, cache);
   }
@@ -421,9 +391,7 @@ function maybeNewOrNullAuthorSummary(
   if (!value) {
     return null;
   } else if (value.__typename) {
-    return cache.all?.has(value)
-      ? value
-      : factories[value.__typename](value, cache);
+    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
   } else {
     return newAuthorSummary(value, cache);
   }
@@ -433,10 +401,7 @@ export interface BookOptions {
   name?: Book["name"];
 }
 
-export function newBook(
-  options: BookOptions = {},
-  cache: Record<string, any> = {},
-): Book {
+export function newBook(options: BookOptions = {}, cache: Record<string, any> = {}): Book {
   const o = (options.__typename ? options : cache["Book"] = {}) as Book;
   (cache.all ??= new Set()).add(o);
   o.__typename = "Book";
@@ -446,32 +411,21 @@ export function newBook(
 
 factories["Book"] = newBook;
 
-function maybeNewBook(
-  value: BookOptions | undefined,
-  cache: Record<string, any>,
-  isSet: boolean = false,
-): Book {
+function maybeNewBook(value: BookOptions | undefined, cache: Record<string, any>, isSet: boolean = false): Book {
   if (value === undefined) {
     return isSet ? undefined : cache["Book"] || newBook({}, cache);
   } else if (value.__typename) {
-    return cache.all?.has(value)
-      ? value
-      : factories[value.__typename](value, cache);
+    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
   } else {
     return newBook(value, cache);
   }
 }
 
-function maybeNewOrNullBook(
-  value: BookOptions | undefined | null,
-  cache: Record<string, any>,
-): Book | null {
+function maybeNewOrNullBook(value: BookOptions | undefined | null, cache: Record<string, any>): Book | null {
   if (!value) {
     return null;
   } else if (value.__typename) {
-    return cache.all?.has(value)
-      ? value
-      : factories[value.__typename](value, cache);
+    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
   } else {
     return newBook(value, cache);
   }
@@ -485,10 +439,7 @@ export function newSaveAuthorLikeResult(
   options: SaveAuthorLikeResultOptions = {},
   cache: Record<string, any> = {},
 ): SaveAuthorLikeResult {
-  const o =
-    (options.__typename
-      ? options
-      : cache["SaveAuthorLikeResult"] = {}) as SaveAuthorLikeResult;
+  const o = (options.__typename ? options : cache["SaveAuthorLikeResult"] = {}) as SaveAuthorLikeResult;
   (cache.all ??= new Set()).add(o);
   o.__typename = "SaveAuthorLikeResult";
   o.authors = options.authors ?? [];
@@ -503,13 +454,9 @@ function maybeNewSaveAuthorLikeResult(
   isSet: boolean = false,
 ): SaveAuthorLikeResult {
   if (value === undefined) {
-    return isSet
-      ? undefined
-      : cache["SaveAuthorLikeResult"] || newSaveAuthorLikeResult({}, cache);
+    return isSet ? undefined : cache["SaveAuthorLikeResult"] || newSaveAuthorLikeResult({}, cache);
   } else if (value.__typename) {
-    return cache.all?.has(value)
-      ? value
-      : factories[value.__typename](value, cache);
+    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
   } else {
     return newSaveAuthorLikeResult(value, cache);
   }
@@ -522,9 +469,7 @@ function maybeNewOrNullSaveAuthorLikeResult(
   if (!value) {
     return null;
   } else if (value.__typename) {
-    return cache.all?.has(value)
-      ? value
-      : factories[value.__typename](value, cache);
+    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
   } else {
     return newSaveAuthorLikeResult(value, cache);
   }
@@ -538,17 +483,10 @@ export function newSaveAuthorResult(
   options: SaveAuthorResultOptions = {},
   cache: Record<string, any> = {},
 ): SaveAuthorResult {
-  const o =
-    (options.__typename
-      ? options
-      : cache["SaveAuthorResult"] = {}) as SaveAuthorResult;
+  const o = (options.__typename ? options : cache["SaveAuthorResult"] = {}) as SaveAuthorResult;
   (cache.all ??= new Set()).add(o);
   o.__typename = "SaveAuthorResult";
-  o.author = maybeNewAuthor(
-    options.author,
-    cache,
-    options.hasOwnProperty("author"),
-  );
+  o.author = maybeNewAuthor(options.author, cache, options.hasOwnProperty("author"));
   return o;
 }
 
@@ -560,13 +498,9 @@ function maybeNewSaveAuthorResult(
   isSet: boolean = false,
 ): SaveAuthorResult {
   if (value === undefined) {
-    return isSet
-      ? undefined
-      : cache["SaveAuthorResult"] || newSaveAuthorResult({}, cache);
+    return isSet ? undefined : cache["SaveAuthorResult"] || newSaveAuthorResult({}, cache);
   } else if (value.__typename) {
-    return cache.all?.has(value)
-      ? value
-      : factories[value.__typename](value, cache);
+    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
   } else {
     return newSaveAuthorResult(value, cache);
   }
@@ -579,9 +513,7 @@ function maybeNewOrNullSaveAuthorResult(
   if (!value) {
     return null;
   } else if (value.__typename) {
-    return cache.all?.has(value)
-      ? value
-      : factories[value.__typename](value, cache);
+    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
   } else {
     return newSaveAuthorResult(value, cache);
   }
@@ -592,10 +524,7 @@ export type AuthorLikeType = Author;
 
 export type AuthorLikeTypeName = "Author";
 
-function maybeNewAuthorLike(
-  value: AuthorLikeOptions | undefined,
-  cache: Record<string, any>,
-): AuthorLikeType {
+function maybeNewAuthorLike(value: AuthorLikeOptions | undefined, cache: Record<string, any>): AuthorLikeType {
   if (value === undefined) {
     return cache["Author"] || newAuthor({}, cache);
   } else if (value.__typename) {
@@ -628,8 +557,7 @@ export function resetFactoryIds() {
 function nextFactoryId(objectName: string): string {
   const nextId = nextFactoryIds[objectName] || 1;
   nextFactoryIds[objectName] = nextId + 1;
-  const tag = taggedIds[objectName] ??
-    objectName.replace(/[a-z]/g, "").toLowerCase();
+  const tag = taggedIds[objectName] ?? objectName.replace(/[a-z]/g, "").toLowerCase();
   return tag + ":" + nextId;
 }
 
@@ -640,8 +568,7 @@ interface GetAuthorSummariesDataOptions {
 export function newGetAuthorSummariesData(data: GetAuthorSummariesDataOptions) {
   return {
     __typename: "Query" as const,
-    authorSummaries: data["authorSummaries"]?.map((d) => newAuthorSummary(d)) ||
-      [],
+    authorSummaries: data["authorSummaries"]?.map((d) => newAuthorSummary(d)) || [],
   };
 }
 
@@ -651,11 +578,7 @@ export function newGetAuthorSummariesResponse(
   return {
     request: { query: GetAuthorSummariesDocument },
     // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
-    result: {
-      data: data instanceof Error
-        ? undefined
-        : newGetAuthorSummariesData(data) as any,
-    },
+    result: { data: data instanceof Error ? undefined : newGetAuthorSummariesData(data) as any },
     error: data instanceof Error ? data : undefined,
   };
 }
@@ -664,10 +587,7 @@ interface SaveAuthorDataOptions {
 }
 
 export function newSaveAuthorData(data: SaveAuthorDataOptions) {
-  return {
-    __typename: "Mutation" as const,
-    saveAuthor: maybeNewSaveAuthorResult(data["saveAuthor"] || undefined, {}),
-  };
+  return { __typename: "Mutation" as const, saveAuthor: maybeNewSaveAuthorResult(data["saveAuthor"] || undefined, {}) };
 }
 
 export function newSaveAuthorResponse(
@@ -677,9 +597,7 @@ export function newSaveAuthorResponse(
   return {
     request: { query: SaveAuthorDocument, variables },
     // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
-    result: {
-      data: data instanceof Error ? undefined : newSaveAuthorData(data) as any,
-    },
+    result: { data: data instanceof Error ? undefined : newSaveAuthorData(data) as any },
     error: data instanceof Error ? data : undefined,
   };
 }
@@ -690,8 +608,7 @@ interface SaveAuthorLikeDataOptions {
 export function newSaveAuthorLikeData(data: SaveAuthorLikeDataOptions) {
   return {
     __typename: "Mutation" as const,
-    saveAuthorLike:
-      data["saveAuthorLike"]?.map((d) => maybeNewAuthorLike(d, {})) || [],
+    saveAuthorLike: data["saveAuthorLike"]?.map((d) => maybeNewAuthorLike(d, {})) || [],
   };
 }
 
@@ -702,11 +619,7 @@ export function newSaveAuthorLikeResponse(
   return {
     request: { query: SaveAuthorLikeDocument, variables },
     // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
-    result: {
-      data: data instanceof Error
-        ? undefined
-        : newSaveAuthorLikeData(data) as any,
-    },
+    result: { data: data instanceof Error ? undefined : newSaveAuthorLikeData(data) as any },
     error: data instanceof Error ? data : undefined,
   };
 }
@@ -715,10 +628,7 @@ interface CurrentAuthorDataOptions {
 }
 
 export function newCurrentAuthorData(data: CurrentAuthorDataOptions) {
-  return {
-    __typename: "Query" as const,
-    currentAuthor: maybeNewOrNullAuthor(data["currentAuthor"] || undefined, {}),
-  };
+  return { __typename: "Query" as const, currentAuthor: maybeNewOrNullAuthor(data["currentAuthor"] || undefined, {}) };
 }
 
 export function newCurrentAuthorResponse(
@@ -727,11 +637,7 @@ export function newCurrentAuthorResponse(
   return {
     request: { query: CurrentAuthorDocument },
     // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
-    result: {
-      data: data instanceof Error
-        ? undefined
-        : newCurrentAuthorData(data) as any,
-    },
+    result: { data: data instanceof Error ? undefined : newCurrentAuthorData(data) as any },
     error: data instanceof Error ? data : undefined,
   };
 }
@@ -754,11 +660,7 @@ export function newMultipleAuthorsResponse(
   return {
     request: { query: MultipleAuthorsDocument },
     // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
-    result: {
-      data: data instanceof Error
-        ? undefined
-        : newMultipleAuthorsData(data) as any,
-    },
+    result: { data: data instanceof Error ? undefined : newMultipleAuthorsData(data) as any },
     error: data instanceof Error ? data : undefined,
   };
 }
