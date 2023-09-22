@@ -14,16 +14,16 @@ describe("factories", () => {
       },
     );
     expect(result.data).toMatchInlineSnapshot(`
-      Object {
+      {
         "__typename": "Mutation",
-        "saveAuthor": Object {
+        "saveAuthor": {
           "__typename": "SaveAuthorResult",
-          "author": Object {
+          "author": {
             "__typename": "Author",
             "birthday": null,
             "name": "a",
             "popularity": "High",
-            "summary": Object {
+            "summary": {
               "__typename": "AuthorSummary",
               "amountOfSales": null,
               "author": [Circular],
@@ -41,13 +41,13 @@ describe("factories", () => {
       authorSummaries: [newAuthorSummary()],
     });
     expect(result.data).toMatchInlineSnapshot(`
-      Object {
+      {
         "__typename": "Query",
-        "authorSummaries": Array [
-          Object {
+        "authorSummaries": [
+          {
             "__typename": "AuthorSummary",
             "amountOfSales": null,
-            "author": Object {
+            "author": {
               "__typename": "Author",
               "birthday": null,
               "name": "name",
