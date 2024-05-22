@@ -476,7 +476,7 @@ export function newGetAuthorSummariesData(data: GetAuthorSummariesDataOptions): 
   return {
     __typename: "Query" as const,
     authorSummaries: data["authorSummaries"]?.map((d) => newAuthorSummary(d)) || [],
-  };
+  } as any;
 }
 
 export function newGetAuthorSummariesResponse(
@@ -486,7 +486,7 @@ export function newGetAuthorSummariesResponse(
     request: { query: GetAuthorSummariesDocument },
     result: { data: data instanceof Error ? undefined : newGetAuthorSummariesData(data) },
     error: data instanceof Error ? data : undefined,
-  } as any;
+  };
 }
 interface SaveAuthorDataOptions {
   saveAuthor?: SaveAuthorResultOptions;
@@ -496,7 +496,7 @@ export function newSaveAuthorData(data: SaveAuthorDataOptions): SaveAuthorMutati
   return {
     __typename: "Mutation" as const,
     saveAuthor: maybeNew("SaveAuthorResult", data["saveAuthor"] || undefined, {}),
-  };
+  } as any;
 }
 
 export function newSaveAuthorResponse(
@@ -507,7 +507,7 @@ export function newSaveAuthorResponse(
     request: { query: SaveAuthorDocument, variables },
     result: { data: data instanceof Error ? undefined : newSaveAuthorData(data) },
     error: data instanceof Error ? data : undefined,
-  } as any;
+  };
 }
 interface SaveAuthorLikeDataOptions {
   saveAuthorLike?: AuthorLikeOptions[];
@@ -517,7 +517,7 @@ export function newSaveAuthorLikeData(data: SaveAuthorLikeDataOptions): SaveAuth
   return {
     __typename: "Mutation" as const,
     saveAuthorLike: data["saveAuthorLike"]?.map((d) => maybeNew("AuthorLike", d, {})) || [],
-  };
+  } as any;
 }
 
 export function newSaveAuthorLikeResponse(
@@ -528,7 +528,7 @@ export function newSaveAuthorLikeResponse(
     request: { query: SaveAuthorLikeDocument, variables },
     result: { data: data instanceof Error ? undefined : newSaveAuthorLikeData(data) },
     error: data instanceof Error ? data : undefined,
-  } as any;
+  };
 }
 interface CurrentAuthorDataOptions {
   currentAuthor?: AuthorOptions | null;
@@ -538,7 +538,7 @@ export function newCurrentAuthorData(data: CurrentAuthorDataOptions): CurrentAut
   return {
     __typename: "Query" as const,
     currentAuthor: maybeNewOrNull("Author", data["currentAuthor"] || undefined, {}),
-  };
+  } as any;
 }
 
 export function newCurrentAuthorResponse(
@@ -548,7 +548,7 @@ export function newCurrentAuthorResponse(
     request: { query: CurrentAuthorDocument },
     result: { data: data instanceof Error ? undefined : newCurrentAuthorData(data) },
     error: data instanceof Error ? data : undefined,
-  } as any;
+  };
 }
 interface MultipleAuthorsDataOptions {
   authorOne?: AuthorOptions | null;
@@ -560,7 +560,7 @@ export function newMultipleAuthorsData(data: MultipleAuthorsDataOptions): Multip
     __typename: "Query" as const,
     authorOne: maybeNewOrNull("Author", data["authorOne"] || undefined, {}),
     authorTwo: maybeNewOrNull("Author", data["authorTwo"] || undefined, {}),
-  };
+  } as any;
 }
 
 export function newMultipleAuthorsResponse(
@@ -570,7 +570,7 @@ export function newMultipleAuthorsResponse(
     request: { query: MultipleAuthorsDocument },
     result: { data: data instanceof Error ? undefined : newMultipleAuthorsData(data) },
     error: data instanceof Error ? data : undefined,
-  } as any;
+  };
 }
 
   export type MockedResponse<V, Q> = {
