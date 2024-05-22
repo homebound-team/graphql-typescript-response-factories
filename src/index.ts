@@ -77,7 +77,9 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
                 }
               } else {
                 const orNull = field.type instanceof GraphQLNonNull ? "" : "OrNull";
-                return `${key}: maybeNew${orNull}("${(type as GraphQLObjectType).name}", data["${key}"] || undefined, {}),`;
+                return `${key}: maybeNew${orNull}("${
+                  (type as GraphQLObjectType).name
+                }", data["${key}"] || undefined, {}),`;
               }
             }
           }
