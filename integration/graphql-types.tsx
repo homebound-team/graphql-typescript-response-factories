@@ -486,7 +486,7 @@ export function newGetAuthorSummariesResponse(
     request: { query: GetAuthorSummariesDocument },
     result: { data: data instanceof Error ? undefined : newGetAuthorSummariesData(data) },
     error: data instanceof Error ? data : undefined,
-  };
+  } as any;
 }
 interface SaveAuthorDataOptions {
   saveAuthor?: SaveAuthorResultOptions;
@@ -507,7 +507,7 @@ export function newSaveAuthorResponse(
     request: { query: SaveAuthorDocument, variables },
     result: { data: data instanceof Error ? undefined : newSaveAuthorData(data) },
     error: data instanceof Error ? data : undefined,
-  };
+  } as any;
 }
 interface SaveAuthorLikeDataOptions {
   saveAuthorLike?: AuthorLikeOptions[];
@@ -528,7 +528,7 @@ export function newSaveAuthorLikeResponse(
     request: { query: SaveAuthorLikeDocument, variables },
     result: { data: data instanceof Error ? undefined : newSaveAuthorLikeData(data) },
     error: data instanceof Error ? data : undefined,
-  };
+  } as any;
 }
 interface CurrentAuthorDataOptions {
   currentAuthor?: AuthorOptions | null;
@@ -548,7 +548,7 @@ export function newCurrentAuthorResponse(
     request: { query: CurrentAuthorDocument },
     result: { data: data instanceof Error ? undefined : newCurrentAuthorData(data) },
     error: data instanceof Error ? data : undefined,
-  };
+  } as any;
 }
 interface MultipleAuthorsDataOptions {
   authorOne?: AuthorOptions | null;
@@ -570,7 +570,7 @@ export function newMultipleAuthorsResponse(
     request: { query: MultipleAuthorsDocument },
     result: { data: data instanceof Error ? undefined : newMultipleAuthorsData(data) },
     error: data instanceof Error ? data : undefined,
-  };
+  } as any;
 }
 
   export type MockedResponse<V, Q> = {

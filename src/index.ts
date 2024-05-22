@@ -95,8 +95,16 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
         request: { query: ${name}Document, ${hasVariables ? "variables, " : ""} },
         result: { data: data instanceof Error ? undefined : new${name}Data(data) },
         error: data instanceof Error ? data : undefined,
-      };
+      } as any;
     }`;
+
+  // The ^ `as any` is because when queries return type unions, i.e. `items {
+  // ...on Project {} ...on Trade {} }`, the type union has `{ __typename: "Project" } |
+  // { __typename: "Trade" }` where `__typename` is required, but currently the POJOs
+  // have just `interface Project { __typename?: "Project" }`, which does not match.
+  //
+  // We could turn on `nonOptionalTypeName` but it breaks a lot of existing tests in
+  // `internal-frontend`, that arguably should be using factories to create their data.
 }
 
 const mockedResponse = `
