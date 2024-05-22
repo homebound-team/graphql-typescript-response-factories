@@ -54,7 +54,7 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
         })}
     }
 
-    export function new${name}Data(data: ${name}DataOptions) {
+    export function new${name}Data(data: ${name}DataOptions): ${name}${operation} {
       return {
         __typename: "${operation}" as const,
         ${def.selectionSet.selections.map((s) => {
@@ -93,8 +93,7 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
     ): MockedResponse<${name}${operation}Variables, ${name}${operation}> {
       return {
         request: { query: ${name}Document, ${hasVariables ? "variables, " : ""} },
-        // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
-        result: { data: data instanceof Error ? undefined : new${name}Data(data) as any },
+        result: { data: data instanceof Error ? undefined : new${name}Data(data) },
         error: data instanceof Error ? data : undefined,
       };
     }`;

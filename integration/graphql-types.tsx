@@ -472,7 +472,7 @@ interface GetAuthorSummariesDataOptions {
   authorSummaries?: AuthorSummaryOptions[];
 }
 
-export function newGetAuthorSummariesData(data: GetAuthorSummariesDataOptions) {
+export function newGetAuthorSummariesData(data: GetAuthorSummariesDataOptions): GetAuthorSummariesQuery {
   return {
     __typename: "Query" as const,
     authorSummaries: data["authorSummaries"]?.map((d) => newAuthorSummary(d)) || [],
@@ -484,8 +484,7 @@ export function newGetAuthorSummariesResponse(
 ): MockedResponse<GetAuthorSummariesQueryVariables, GetAuthorSummariesQuery> {
   return {
     request: { query: GetAuthorSummariesDocument },
-    // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
-    result: { data: data instanceof Error ? undefined : newGetAuthorSummariesData(data) as any },
+    result: { data: data instanceof Error ? undefined : newGetAuthorSummariesData(data) },
     error: data instanceof Error ? data : undefined,
   };
 }
@@ -493,7 +492,7 @@ interface SaveAuthorDataOptions {
   saveAuthor?: SaveAuthorResultOptions;
 }
 
-export function newSaveAuthorData(data: SaveAuthorDataOptions) {
+export function newSaveAuthorData(data: SaveAuthorDataOptions): SaveAuthorMutation {
   return {
     __typename: "Mutation" as const,
     saveAuthor: maybeNew("SaveAuthorResult", data["saveAuthor"] || undefined, {}),
@@ -506,8 +505,7 @@ export function newSaveAuthorResponse(
 ): MockedResponse<SaveAuthorMutationVariables, SaveAuthorMutation> {
   return {
     request: { query: SaveAuthorDocument, variables },
-    // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
-    result: { data: data instanceof Error ? undefined : newSaveAuthorData(data) as any },
+    result: { data: data instanceof Error ? undefined : newSaveAuthorData(data) },
     error: data instanceof Error ? data : undefined,
   };
 }
@@ -515,7 +513,7 @@ interface SaveAuthorLikeDataOptions {
   saveAuthorLike?: AuthorLikeOptions[];
 }
 
-export function newSaveAuthorLikeData(data: SaveAuthorLikeDataOptions) {
+export function newSaveAuthorLikeData(data: SaveAuthorLikeDataOptions): SaveAuthorLikeMutation {
   return {
     __typename: "Mutation" as const,
     saveAuthorLike: data["saveAuthorLike"]?.map((d) => maybeNew("AuthorLike", d, {})) || [],
@@ -528,8 +526,7 @@ export function newSaveAuthorLikeResponse(
 ): MockedResponse<SaveAuthorLikeMutationVariables, SaveAuthorLikeMutation> {
   return {
     request: { query: SaveAuthorLikeDocument, variables },
-    // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
-    result: { data: data instanceof Error ? undefined : newSaveAuthorLikeData(data) as any },
+    result: { data: data instanceof Error ? undefined : newSaveAuthorLikeData(data) },
     error: data instanceof Error ? data : undefined,
   };
 }
@@ -537,7 +534,7 @@ interface CurrentAuthorDataOptions {
   currentAuthor?: AuthorOptions | null;
 }
 
-export function newCurrentAuthorData(data: CurrentAuthorDataOptions) {
+export function newCurrentAuthorData(data: CurrentAuthorDataOptions): CurrentAuthorQuery {
   return {
     __typename: "Query" as const,
     currentAuthor: maybeNewOrNull("Author", data["currentAuthor"] || undefined, {}),
@@ -549,8 +546,7 @@ export function newCurrentAuthorResponse(
 ): MockedResponse<CurrentAuthorQueryVariables, CurrentAuthorQuery> {
   return {
     request: { query: CurrentAuthorDocument },
-    // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
-    result: { data: data instanceof Error ? undefined : newCurrentAuthorData(data) as any },
+    result: { data: data instanceof Error ? undefined : newCurrentAuthorData(data) },
     error: data instanceof Error ? data : undefined,
   };
 }
@@ -559,7 +555,7 @@ interface MultipleAuthorsDataOptions {
   authorTwo?: AuthorOptions | null;
 }
 
-export function newMultipleAuthorsData(data: MultipleAuthorsDataOptions) {
+export function newMultipleAuthorsData(data: MultipleAuthorsDataOptions): MultipleAuthorsQuery {
   return {
     __typename: "Query" as const,
     authorOne: maybeNewOrNull("Author", data["authorOne"] || undefined, {}),
@@ -572,8 +568,7 @@ export function newMultipleAuthorsResponse(
 ): MockedResponse<MultipleAuthorsQueryVariables, MultipleAuthorsQuery> {
   return {
     request: { query: MultipleAuthorsDocument },
-    // TODO Remove the any by having interfaces have a __typename that pacifies mutation type unions
-    result: { data: data instanceof Error ? undefined : newMultipleAuthorsData(data) as any },
+    result: { data: data instanceof Error ? undefined : newMultipleAuthorsData(data) },
     error: data instanceof Error ? data : undefined,
   };
 }
