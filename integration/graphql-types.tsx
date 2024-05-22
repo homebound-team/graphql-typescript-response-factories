@@ -166,8 +166,13 @@ export function useGetAuthorSummariesLazyQuery(baseOptions?: Apollo.LazyQueryHoo
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables>(GetAuthorSummariesDocument, options);
         }
+export function useGetAuthorSummariesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables>(GetAuthorSummariesDocument, options);
+        }
 export type GetAuthorSummariesQueryHookResult = ReturnType<typeof useGetAuthorSummariesQuery>;
 export type GetAuthorSummariesLazyQueryHookResult = ReturnType<typeof useGetAuthorSummariesLazyQuery>;
+export type GetAuthorSummariesSuspenseQueryHookResult = ReturnType<typeof useGetAuthorSummariesSuspenseQuery>;
 export type GetAuthorSummariesQueryResult = Apollo.QueryResult<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables>;
 export const SaveAuthorDocument = gql`
     mutation SaveAuthor($input: AuthorInput!) {
@@ -268,8 +273,13 @@ export function useCurrentAuthorLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<CurrentAuthorQuery, CurrentAuthorQueryVariables>(CurrentAuthorDocument, options);
         }
+export function useCurrentAuthorSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CurrentAuthorQuery, CurrentAuthorQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CurrentAuthorQuery, CurrentAuthorQueryVariables>(CurrentAuthorDocument, options);
+        }
 export type CurrentAuthorQueryHookResult = ReturnType<typeof useCurrentAuthorQuery>;
 export type CurrentAuthorLazyQueryHookResult = ReturnType<typeof useCurrentAuthorLazyQuery>;
+export type CurrentAuthorSuspenseQueryHookResult = ReturnType<typeof useCurrentAuthorSuspenseQuery>;
 export type CurrentAuthorQueryResult = Apollo.QueryResult<CurrentAuthorQuery, CurrentAuthorQueryVariables>;
 export const MultipleAuthorsDocument = gql`
     query MultipleAuthors {
@@ -305,8 +315,13 @@ export function useMultipleAuthorsLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<MultipleAuthorsQuery, MultipleAuthorsQueryVariables>(MultipleAuthorsDocument, options);
         }
+export function useMultipleAuthorsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MultipleAuthorsQuery, MultipleAuthorsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MultipleAuthorsQuery, MultipleAuthorsQueryVariables>(MultipleAuthorsDocument, options);
+        }
 export type MultipleAuthorsQueryHookResult = ReturnType<typeof useMultipleAuthorsQuery>;
 export type MultipleAuthorsLazyQueryHookResult = ReturnType<typeof useMultipleAuthorsLazyQuery>;
+export type MultipleAuthorsSuspenseQueryHookResult = ReturnType<typeof useMultipleAuthorsSuspenseQuery>;
 export type MultipleAuthorsQueryResult = Apollo.QueryResult<MultipleAuthorsQuery, MultipleAuthorsQueryVariables>;
 const factories: Record<string, Function> = {};
 export interface AuthorOptions {
@@ -457,7 +472,7 @@ interface GetAuthorSummariesDataOptions {
   authorSummaries?: AuthorSummaryOptions[];
 }
 
-function newGetAuthorSummariesData(data: GetAuthorSummariesDataOptions) {
+export function newGetAuthorSummariesData(data: GetAuthorSummariesDataOptions) {
   return {
     __typename: "Query" as const,
     authorSummaries: data["authorSummaries"]?.map((d) => newAuthorSummary(d)) || [],
@@ -478,7 +493,7 @@ interface SaveAuthorDataOptions {
   saveAuthor?: SaveAuthorResultOptions;
 }
 
-function newSaveAuthorData(data: SaveAuthorDataOptions) {
+export function newSaveAuthorData(data: SaveAuthorDataOptions) {
   return {
     __typename: "Mutation" as const,
     saveAuthor: maybeNew("SaveAuthorResult", data["saveAuthor"] || undefined, {}),
@@ -500,7 +515,7 @@ interface SaveAuthorLikeDataOptions {
   saveAuthorLike?: AuthorLikeOptions[];
 }
 
-function newSaveAuthorLikeData(data: SaveAuthorLikeDataOptions) {
+export function newSaveAuthorLikeData(data: SaveAuthorLikeDataOptions) {
   return {
     __typename: "Mutation" as const,
     saveAuthorLike: data["saveAuthorLike"]?.map((d) => maybeNew("AuthorLike", d, {})) || [],
@@ -522,7 +537,7 @@ interface CurrentAuthorDataOptions {
   currentAuthor?: AuthorOptions | null;
 }
 
-function newCurrentAuthorData(data: CurrentAuthorDataOptions) {
+export function newCurrentAuthorData(data: CurrentAuthorDataOptions) {
   return {
     __typename: "Query" as const,
     currentAuthor: maybeNewOrNull("Author", data["currentAuthor"] || undefined, {}),
@@ -544,7 +559,7 @@ interface MultipleAuthorsDataOptions {
   authorTwo?: AuthorOptions | null;
 }
 
-function newMultipleAuthorsData(data: MultipleAuthorsDataOptions) {
+export function newMultipleAuthorsData(data: MultipleAuthorsDataOptions) {
   return {
     __typename: "Query" as const,
     authorOne: maybeNewOrNull("Author", data["authorOne"] || undefined, {}),

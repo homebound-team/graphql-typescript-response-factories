@@ -54,7 +54,7 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
         })}
     }
 
-    function new${name}Data(data: ${name}DataOptions) {
+    export function new${name}Data(data: ${name}DataOptions) {
       return {
         __typename: "${operation}" as const,
         ${def.selectionSet.selections.map((s) => {
