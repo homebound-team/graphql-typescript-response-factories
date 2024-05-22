@@ -98,12 +98,13 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
       } as any;
     }`;
 
-  // The ^ `as any` is because when queries return type unions, i.e. `feed {
-  // ...on Project }`, the type union has `{ __typename: "Project" }` required,
-  // and currently the POJOs have `interface Project { __typename?: "Project" }`,
-  // which does not match. We could turn on `nonOptionalTypeName` but it breaks
-  // a lot of existing tests in `internal-frontend`, that arguably should be using
-  // factories to create their data.
+  // The ^ `as any` is because when queries return type unions, i.e. `items {
+  // ...on Project {} ...on Trade {} }`, the type union has `{ __typename: "Project" } |
+  // { __typename: "Trade" }` where `__typename` is required, but currently the POJOs
+  // have just `interface Project { __typename?: "Project" }`, which does not match.
+  //
+  // We could turn on `nonOptionalTypeName` but it breaks a lot of existing tests in
+  // `internal-frontend`, that arguably should be using factories to create their data.
 }
 
 const mockedResponse = `
