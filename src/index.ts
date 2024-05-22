@@ -54,7 +54,7 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
         })}
     }
 
-    export function new${name}Data(data: ${name}DataOptions) {
+    function new${name}Data(data: ${name}DataOptions) {
       return {
         __typename: "${operation}" as const,
         ${def.selectionSet.selections.map((s) => {
@@ -69,7 +69,7 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
               if (type instanceof GraphQLList) {
                 type = maybeDenull(type.ofType);
                 if (type instanceof GraphQLInterfaceType) {
-                  return `${key}: data["${key}"]?.map(d => maybeNew${type.name}(d, {})) || [],`;
+                  return `${key}: data["${key}"]?.map(d => maybeNew("${type.name}", d, {})) || [],`;
                 } else if (type instanceof GraphQLObjectType) {
                   return `${key}: data["${key}"]?.map(d => new${type.name}(d)) || [],`;
                 } else {
@@ -77,7 +77,7 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
                 }
               } else {
                 const orNull = field.type instanceof GraphQLNonNull ? "" : "OrNull";
-                return `${key}: maybeNew${orNull}${(type as GraphQLObjectType).name}(data["${key}"] || undefined, {}),`;
+                return `${key}: maybeNew${orNull}("${(type as GraphQLObjectType).name}", data["${key}"] || undefined, {}),`;
               }
             }
           }

@@ -325,32 +325,13 @@ export function newAuthor(options: AuthorOptions = {}, cache: Record<string, any
   o.birthday = options.birthday ?? null;
   o.name = options.name ?? "name";
   o.popularity = options.popularity ?? Popularity.High;
-  o.summary = maybeNewAuthorSummary(options.summary, cache, options.hasOwnProperty("summary"));
+  o.summary = maybeNew("AuthorSummary", options.summary, cache, options.hasOwnProperty("summary"));
   o.working = options.working ?? null;
   return o;
 }
 
 factories["Author"] = newAuthor;
 
-function maybeNewAuthor(value: AuthorOptions | undefined, cache: Record<string, any>, isSet: boolean = false): Author {
-  if (value === undefined) {
-    return isSet ? undefined : cache["Author"] || newAuthor({}, cache);
-  } else if (value.__typename) {
-    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
-  } else {
-    return newAuthor(value, cache);
-  }
-}
-
-function maybeNewOrNullAuthor(value: AuthorOptions | undefined | null, cache: Record<string, any>): Author | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
-  } else {
-    return newAuthor(value, cache);
-  }
-}
 export interface AuthorSummaryOptions {
   __typename?: "AuthorSummary";
   amountOfSales?: AuthorSummary["amountOfSales"];
@@ -363,39 +344,13 @@ export function newAuthorSummary(options: AuthorSummaryOptions = {}, cache: Reco
   (cache.all ??= new Set()).add(o);
   o.__typename = "AuthorSummary";
   o.amountOfSales = options.amountOfSales ?? null;
-  o.author = maybeNewAuthor(options.author, cache, options.hasOwnProperty("author"));
+  o.author = maybeNew("Author", options.author, cache, options.hasOwnProperty("author"));
   o.numberOfBooks = options.numberOfBooks ?? 0;
   return o;
 }
 
 factories["AuthorSummary"] = newAuthorSummary;
 
-function maybeNewAuthorSummary(
-  value: AuthorSummaryOptions | undefined,
-  cache: Record<string, any>,
-  isSet: boolean = false,
-): AuthorSummary {
-  if (value === undefined) {
-    return isSet ? undefined : cache["AuthorSummary"] || newAuthorSummary({}, cache);
-  } else if (value.__typename) {
-    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
-  } else {
-    return newAuthorSummary(value, cache);
-  }
-}
-
-function maybeNewOrNullAuthorSummary(
-  value: AuthorSummaryOptions | undefined | null,
-  cache: Record<string, any>,
-): AuthorSummary | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
-  } else {
-    return newAuthorSummary(value, cache);
-  }
-}
 export interface BookOptions {
   __typename?: "Book";
   name?: Book["name"];
@@ -411,25 +366,6 @@ export function newBook(options: BookOptions = {}, cache: Record<string, any> = 
 
 factories["Book"] = newBook;
 
-function maybeNewBook(value: BookOptions | undefined, cache: Record<string, any>, isSet: boolean = false): Book {
-  if (value === undefined) {
-    return isSet ? undefined : cache["Book"] || newBook({}, cache);
-  } else if (value.__typename) {
-    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
-  } else {
-    return newBook(value, cache);
-  }
-}
-
-function maybeNewOrNullBook(value: BookOptions | undefined | null, cache: Record<string, any>): Book | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
-  } else {
-    return newBook(value, cache);
-  }
-}
 export interface SaveAuthorLikeResultOptions {
   __typename?: "SaveAuthorLikeResult";
   authors?: SaveAuthorLikeResult["authors"];
@@ -448,32 +384,6 @@ export function newSaveAuthorLikeResult(
 
 factories["SaveAuthorLikeResult"] = newSaveAuthorLikeResult;
 
-function maybeNewSaveAuthorLikeResult(
-  value: SaveAuthorLikeResultOptions | undefined,
-  cache: Record<string, any>,
-  isSet: boolean = false,
-): SaveAuthorLikeResult {
-  if (value === undefined) {
-    return isSet ? undefined : cache["SaveAuthorLikeResult"] || newSaveAuthorLikeResult({}, cache);
-  } else if (value.__typename) {
-    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
-  } else {
-    return newSaveAuthorLikeResult(value, cache);
-  }
-}
-
-function maybeNewOrNullSaveAuthorLikeResult(
-  value: SaveAuthorLikeResultOptions | undefined | null,
-  cache: Record<string, any>,
-): SaveAuthorLikeResult | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
-  } else {
-    return newSaveAuthorLikeResult(value, cache);
-  }
-}
 export interface SaveAuthorResultOptions {
   __typename?: "SaveAuthorResult";
   author?: AuthorOptions;
@@ -486,66 +396,19 @@ export function newSaveAuthorResult(
   const o = (options.__typename ? options : cache["SaveAuthorResult"] = {}) as SaveAuthorResult;
   (cache.all ??= new Set()).add(o);
   o.__typename = "SaveAuthorResult";
-  o.author = maybeNewAuthor(options.author, cache, options.hasOwnProperty("author"));
+  o.author = maybeNew("Author", options.author, cache, options.hasOwnProperty("author"));
   return o;
 }
 
 factories["SaveAuthorResult"] = newSaveAuthorResult;
 
-function maybeNewSaveAuthorResult(
-  value: SaveAuthorResultOptions | undefined,
-  cache: Record<string, any>,
-  isSet: boolean = false,
-): SaveAuthorResult {
-  if (value === undefined) {
-    return isSet ? undefined : cache["SaveAuthorResult"] || newSaveAuthorResult({}, cache);
-  } else if (value.__typename) {
-    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
-  } else {
-    return newSaveAuthorResult(value, cache);
-  }
-}
-
-function maybeNewOrNullSaveAuthorResult(
-  value: SaveAuthorResultOptions | undefined | null,
-  cache: Record<string, any>,
-): SaveAuthorResult | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
-  } else {
-    return newSaveAuthorResult(value, cache);
-  }
-}
 export type AuthorLikeOptions = AuthorOptions;
 
 export type AuthorLikeType = Author;
 
 export type AuthorLikeTypeName = "Author";
 
-function maybeNewAuthorLike(value: AuthorLikeOptions | undefined, cache: Record<string, any>): AuthorLikeType {
-  if (value === undefined) {
-    return cache["Author"] || newAuthor({}, cache);
-  } else if (value.__typename) {
-    return value as AuthorLikeType;
-  } else {
-    return newAuthor(value as unknown as AuthorOptions, cache);
-  }
-}
-
-function maybeNewOrNullAuthorLike(
-  value: AuthorLikeOptions | undefined | null,
-  cache: Record<string, any>,
-): AuthorLike | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as AuthorLikeType;
-  } else {
-    return newAuthor(value as unknown as AuthorOptions, cache);
-  }
-}
+factories["AuthorLike"] = newAuthor;
 
 const taggedIds: Record<string, string> = {};
 let nextFactoryIds: Record<string, number> = {};
@@ -561,11 +424,40 @@ function nextFactoryId(objectName: string): string {
   return tag + ":" + nextId;
 }
 
+function maybeNew(
+  type: string,
+  value: { __typename?: string } | object | undefined,
+  cache: Record<string, any>,
+  isSet: boolean = false,
+): any {
+  if (value === undefined) {
+    return isSet ? undefined : cache[type] || factories[type]({}, cache);
+  } else if ("__typename" in value && value.__typename) {
+    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
+  } else {
+    return factories[type](value, cache);
+  }
+}
+
+function maybeNewOrNull(
+  type: string,
+  value: { __typename?: string } | object | undefined | null,
+  cache: Record<string, any>,
+): any {
+  if (!value) {
+    return null;
+  } else if ("__typename" in value && value.__typename) {
+    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
+  } else {
+    return factories[type](value, cache);
+  }
+}
+
 interface GetAuthorSummariesDataOptions {
   authorSummaries?: AuthorSummaryOptions[];
 }
 
-export function newGetAuthorSummariesData(data: GetAuthorSummariesDataOptions) {
+function newGetAuthorSummariesData(data: GetAuthorSummariesDataOptions) {
   return {
     __typename: "Query" as const,
     authorSummaries: data["authorSummaries"]?.map((d) => newAuthorSummary(d)) || [],
@@ -586,8 +478,11 @@ interface SaveAuthorDataOptions {
   saveAuthor?: SaveAuthorResultOptions;
 }
 
-export function newSaveAuthorData(data: SaveAuthorDataOptions) {
-  return { __typename: "Mutation" as const, saveAuthor: maybeNewSaveAuthorResult(data["saveAuthor"] || undefined, {}) };
+function newSaveAuthorData(data: SaveAuthorDataOptions) {
+  return {
+    __typename: "Mutation" as const,
+    saveAuthor: maybeNew("SaveAuthorResult", data["saveAuthor"] || undefined, {}),
+  };
 }
 
 export function newSaveAuthorResponse(
@@ -605,10 +500,10 @@ interface SaveAuthorLikeDataOptions {
   saveAuthorLike?: AuthorLikeOptions[];
 }
 
-export function newSaveAuthorLikeData(data: SaveAuthorLikeDataOptions) {
+function newSaveAuthorLikeData(data: SaveAuthorLikeDataOptions) {
   return {
     __typename: "Mutation" as const,
-    saveAuthorLike: data["saveAuthorLike"]?.map((d) => maybeNewAuthorLike(d, {})) || [],
+    saveAuthorLike: data["saveAuthorLike"]?.map((d) => maybeNew("AuthorLike", d, {})) || [],
   };
 }
 
@@ -627,8 +522,11 @@ interface CurrentAuthorDataOptions {
   currentAuthor?: AuthorOptions | null;
 }
 
-export function newCurrentAuthorData(data: CurrentAuthorDataOptions) {
-  return { __typename: "Query" as const, currentAuthor: maybeNewOrNullAuthor(data["currentAuthor"] || undefined, {}) };
+function newCurrentAuthorData(data: CurrentAuthorDataOptions) {
+  return {
+    __typename: "Query" as const,
+    currentAuthor: maybeNewOrNull("Author", data["currentAuthor"] || undefined, {}),
+  };
 }
 
 export function newCurrentAuthorResponse(
@@ -646,11 +544,11 @@ interface MultipleAuthorsDataOptions {
   authorTwo?: AuthorOptions | null;
 }
 
-export function newMultipleAuthorsData(data: MultipleAuthorsDataOptions) {
+function newMultipleAuthorsData(data: MultipleAuthorsDataOptions) {
   return {
     __typename: "Query" as const,
-    authorOne: maybeNewOrNullAuthor(data["authorOne"] || undefined, {}),
-    authorTwo: maybeNewOrNullAuthor(data["authorTwo"] || undefined, {}),
+    authorOne: maybeNewOrNull("Author", data["authorOne"] || undefined, {}),
+    authorTwo: maybeNewOrNull("Author", data["authorTwo"] || undefined, {}),
   };
 }
 

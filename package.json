@@ -20,7 +20,7 @@
     "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/typescript-operations": "^4.0.1",
     "@graphql-codegen/typescript-react-apollo": "^3.3.7",
-    "@homebound/graphql-typescript-factories": "^2.61.0",
+    "@homebound/graphql-typescript-factories": "^2.68.0",
     "@types/jest": "^29.5.5",
     "@types/react": "^18.2.22",
     "husky": "^3.0.9",
