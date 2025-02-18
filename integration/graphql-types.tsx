@@ -469,7 +469,7 @@ function maybeNewOrNull(
 }
 
 interface GetAuthorSummariesDataOptions {
-  authorSummaries?: AuthorSummaryOptions[];
+  authorSummaries?: (AuthorSummary | AuthorSummaryOptions)[];
 }
 
 export function newGetAuthorSummariesData(data: GetAuthorSummariesDataOptions): GetAuthorSummariesQuery {
@@ -489,7 +489,7 @@ export function newGetAuthorSummariesResponse(
   };
 }
 interface SaveAuthorDataOptions {
-  saveAuthor?: SaveAuthorResultOptions;
+  saveAuthor?: SaveAuthorResult | SaveAuthorResultOptions;
 }
 
 export function newSaveAuthorData(data: SaveAuthorDataOptions): SaveAuthorMutation {
@@ -510,7 +510,7 @@ export function newSaveAuthorResponse(
   };
 }
 interface SaveAuthorLikeDataOptions {
-  saveAuthorLike?: AuthorLikeOptions[];
+  saveAuthorLike?: (AuthorLike | AuthorLikeOptions)[];
 }
 
 export function newSaveAuthorLikeData(data: SaveAuthorLikeDataOptions): SaveAuthorLikeMutation {
@@ -531,7 +531,7 @@ export function newSaveAuthorLikeResponse(
   };
 }
 interface CurrentAuthorDataOptions {
-  currentAuthor?: AuthorOptions | null;
+  currentAuthor?: Author | AuthorOptions | null;
 }
 
 export function newCurrentAuthorData(data: CurrentAuthorDataOptions): CurrentAuthorQuery {
@@ -551,8 +551,8 @@ export function newCurrentAuthorResponse(
   };
 }
 interface MultipleAuthorsDataOptions {
-  authorOne?: AuthorOptions | null;
-  authorTwo?: AuthorOptions | null;
+  authorOne?: Author | AuthorOptions | null;
+  authorTwo?: Author | AuthorOptions | null;
 }
 
 export function newMultipleAuthorsData(data: MultipleAuthorsDataOptions): MultipleAuthorsQuery {
