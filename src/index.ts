@@ -7,6 +7,7 @@ import {
   GraphQLOutputType,
   GraphQLSchema,
   OperationDefinitionNode,
+  GraphQLNamedType,
 } from "graphql";
 import { Code, code } from "ts-poet";
 import PluginOutput = Types.PluginOutput;
@@ -41,13 +42,13 @@ function newOperationFactory(schema: GraphQLSchema, def: OperationDefinitionNode
             const key = s.alias?.value || name;
             const field = rootType?.getFields()[name];
             if (field) {
-              let type = maybeDenull(field.type);
+              let type = maybeDenull(field.type) as GraphQLNamedType;
               if (type instanceof GraphQLList) {
-                type = maybeDenull(type.ofType);
-                return `${key}?: ${(type as any).name}Options[];`;
+                type = maybeDenull(type.ofType) as GraphQLNamedType;
+                return `${key}?: (${type.name} | ${type.name}Options)[];`;
               } else {
                 const orNull = field.type instanceof GraphQLNonNull ? "" : " | null";
-                return `${key}?: ${(type as GraphQLObjectType).name}Options${orNull};`;
+                return `${key}?: ${type.name} | ${type.name}Options${orNull};`;
               }
             }
           }
