@@ -166,8 +166,8 @@ export function useGetAuthorSummariesLazyQuery(baseOptions?: Apollo.LazyQueryHoo
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables>(GetAuthorSummariesDocument, options);
         }
-export function useGetAuthorSummariesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useGetAuthorSummariesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<GetAuthorSummariesQuery, GetAuthorSummariesQueryVariables>(GetAuthorSummariesDocument, options);
         }
 export type GetAuthorSummariesQueryHookResult = ReturnType<typeof useGetAuthorSummariesQuery>;
@@ -273,8 +273,8 @@ export function useCurrentAuthorLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<CurrentAuthorQuery, CurrentAuthorQueryVariables>(CurrentAuthorDocument, options);
         }
-export function useCurrentAuthorSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CurrentAuthorQuery, CurrentAuthorQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useCurrentAuthorSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<CurrentAuthorQuery, CurrentAuthorQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<CurrentAuthorQuery, CurrentAuthorQueryVariables>(CurrentAuthorDocument, options);
         }
 export type CurrentAuthorQueryHookResult = ReturnType<typeof useCurrentAuthorQuery>;
@@ -315,8 +315,8 @@ export function useMultipleAuthorsLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<MultipleAuthorsQuery, MultipleAuthorsQueryVariables>(MultipleAuthorsDocument, options);
         }
-export function useMultipleAuthorsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MultipleAuthorsQuery, MultipleAuthorsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
+export function useMultipleAuthorsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MultipleAuthorsQuery, MultipleAuthorsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
           return Apollo.useSuspenseQuery<MultipleAuthorsQuery, MultipleAuthorsQueryVariables>(MultipleAuthorsDocument, options);
         }
 export type MultipleAuthorsQueryHookResult = ReturnType<typeof useMultipleAuthorsQuery>;
@@ -324,12 +324,13 @@ export type MultipleAuthorsLazyQueryHookResult = ReturnType<typeof useMultipleAu
 export type MultipleAuthorsSuspenseQueryHookResult = ReturnType<typeof useMultipleAuthorsSuspenseQuery>;
 export type MultipleAuthorsQueryResult = Apollo.QueryResult<MultipleAuthorsQuery, MultipleAuthorsQueryVariables>;
 const factories: Record<string, Function> = {};
+type RequireTypename<T extends { __typename?: string }> = Omit<T, "__typename"> & Required<Pick<T, "__typename">>;
 export interface AuthorOptions {
   __typename?: "Author";
   birthday?: Author["birthday"];
   name?: Author["name"];
   popularity?: Author["popularity"];
-  summary?: AuthorSummaryOptions;
+  summary?: AuthorSummary | AuthorSummaryOptions;
   working?: Author["working"];
 }
 
@@ -350,7 +351,7 @@ factories["Author"] = newAuthor;
 export interface AuthorSummaryOptions {
   __typename?: "AuthorSummary";
   amountOfSales?: AuthorSummary["amountOfSales"];
-  author?: AuthorOptions;
+  author?: Author | AuthorOptions;
   numberOfBooks?: AuthorSummary["numberOfBooks"];
 }
 
@@ -383,7 +384,7 @@ factories["Book"] = newBook;
 
 export interface SaveAuthorLikeResultOptions {
   __typename?: "SaveAuthorLikeResult";
-  authors?: SaveAuthorLikeResult["authors"];
+  authors?: Array<Author | AuthorLike | AuthorLikeOptions>;
 }
 
 export function newSaveAuthorLikeResult(
@@ -393,7 +394,7 @@ export function newSaveAuthorLikeResult(
   const o = (options.__typename ? options : cache["SaveAuthorLikeResult"] = {}) as SaveAuthorLikeResult;
   (cache.all ??= new Set()).add(o);
   o.__typename = "SaveAuthorLikeResult";
-  o.authors = options.authors ?? [];
+  o.authors = (options.authors ?? []).map((i) => maybeNew("AuthorLike", i, cache, options.hasOwnProperty("authors")));
   return o;
 }
 
@@ -401,7 +402,7 @@ factories["SaveAuthorLikeResult"] = newSaveAuthorLikeResult;
 
 export interface SaveAuthorResultOptions {
   __typename?: "SaveAuthorResult";
-  author?: AuthorOptions;
+  author?: Author | AuthorOptions;
 }
 
 export function newSaveAuthorResult(
@@ -423,7 +424,15 @@ export type AuthorLikeType = Author;
 
 export type AuthorLikeTypeName = "Author";
 
-factories["AuthorLike"] = newAuthor;
+export function newAuthorLike(): Author;
+export function newAuthorLike(options: AuthorOptions, cache?: Record<string, any>): Author;
+export function newAuthorLike(options: AuthorLikeOptions = {}, cache: Record<string, any> = {}): AuthorLikeType {
+  const { __typename = "Author" } = options ?? {};
+  const maybeCached = Object.keys(options).length === 0 ? cache[__typename] : undefined;
+  return maybeCached ?? maybeNew(__typename, options ?? {}, cache);
+}
+
+factories["AuthorLike"] = newAuthorLike;
 
 const taggedIds: Record<string, string> = {};
 let nextFactoryIds: Record<string, number> = {};
