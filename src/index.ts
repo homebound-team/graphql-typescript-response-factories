@@ -94,7 +94,7 @@ function newOperationFactory(config: Config, schema: GraphQLSchema, def: Operati
       data: ${name}DataOptions | Error
     ): MockedResponse<${name}${operation}Variables, ${name}${operation}> {
       return {
-        request: { query: ${name}Document, ${hasVariables ? "variables, " : ""} },
+        request: { query: ${maybeImport(config, name + "Document")}, ${hasVariables ? "variables, " : ""} },
         result: { data: data instanceof Error ? undefined : new${name}Data(data) },
         error: data instanceof Error ? data : undefined,
       };
