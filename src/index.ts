@@ -15,8 +15,8 @@ import type { Config } from "./types";
 import { createFileReferenceFunction, type FileReferenceFunction } from "./fileReference";
 
 /** Generates `newQueryResponse({ ... })` factory functions in our `graphql-types` codegen output. */
-export const plugin: PluginFunction = async (schema, documents, config: Config) => {
-  const getFileReference = createFileReferenceFunction(config);
+export const plugin: PluginFunction = async (schema, documents, config: Config, info) => {
+  const getFileReference = createFileReferenceFunction(config, info?.outputFile);
   const factories: Code[] = [];
   documents.forEach((d) => {
     if (d.document) {

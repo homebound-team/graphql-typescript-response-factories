@@ -1,6 +1,6 @@
 // The un-exported methods are copied from the `near-operation-file-preset` package.
 // In the future, we might choose to use the package directly, but the methods aren't directly exposed.
-import { parse as parsePath, join } from "path";
+import { parse as parsePath, join, relative } from "path";
 import type { NearOperationFilePresetConfig } from "./types";
 
 export type NearOperationFileConfigWithDefaults = Required<
@@ -10,13 +10,20 @@ export type NearOperationFileConfigWithDefaults = Required<
 export function generateNearOperationFileImport(
   nearOpFilePreset: NearOperationFileConfigWithDefaults,
   location: string,
-  { emitLegacyCommonJSImports, cwd }: { emitLegacyCommonJSImports: boolean; cwd: string },
+  {
+    emitLegacyCommonJSImports,
+    cwd,
+    outputFile,
+  }: { emitLegacyCommonJSImports: boolean; cwd: string; outputFile: string },
 ) {
   const { fileName, extension, folder } = nearOpFilePreset;
   const absoluteFilePath = generateFilePath({ fileName, extension, folder }, location);
 
-  // Strip `cwd` (ensuring trailing slash)
-  const relativeFilePath = absoluteFilePath.replace(cwd + (cwd.endsWith("/") ? "" : "/"), "");
+  // Get the directory of outputFile relative to cwd
+  const outputFileDir = parsePath(join(cwd, outputFile)).dir;
+
+  // Calculate relative path from outputFile's directory to the source file
+  const relativeFilePath = relative(outputFileDir, absoluteFilePath);
 
   // Strip extension if we're emitting legacy CommonJS imports
   if (emitLegacyCommonJSImports) {

@@ -5,8 +5,14 @@ import { generateNearOperationFileImport, type NearOperationFileConfigWithDefaul
 
 export type FileReferenceFunction = (typeName: string, documentFile: Types.DocumentFile) => Code;
 
-export function createFileReferenceFunction(config: Config): FileReferenceFunction {
+export function createFileReferenceFunction(config: Config, outputFile?: string): FileReferenceFunction {
   if (config.nearOperationFilePresetConfig) {
+    if (!outputFile) {
+      throw new Error(
+        "outputFile should have been defined by the plugin logic. Without this, we don't know how to define relative imports.",
+      );
+    }
+
     // Defaults from
     // https://github.com/dotansimha/graphql-code-generator-community/blob/152d2ddbd9a7b86d1f75ab7d86dfaacff5caa2be/packages/presets/near-operation-file/src/index.ts#L220-L222
     const nearOperationFileConfig: NearOperationFileConfigWithDefaults = {
@@ -14,12 +20,13 @@ export function createFileReferenceFunction(config: Config): FileReferenceFuncti
       extension: config.nearOperationFilePresetConfig.extension ?? ".generated.ts",
       folder: config.nearOperationFilePresetConfig.folder ?? "",
     };
-    const cwd = process.cwd();
+    const cwd = config.nearOperationFilePresetConfig.cwd ?? process.cwd();
 
     return (typeName, documentFile) => {
       const importPath = generateNearOperationFileImport(nearOperationFileConfig, documentFile.location!, {
-        emitLegacyCommonJSImports: !!config.emitLegacyCommonJSImports,
         cwd,
+        emitLegacyCommonJSImports: !!config.emitLegacyCommonJSImports,
+        outputFile,
       });
       return code`${imp(`${typeName}@${importPath}`)}`;
     };

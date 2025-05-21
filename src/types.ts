@@ -12,4 +12,5 @@ export interface NearOperationFilePresetConfig {
   extension?: string;
   folder?: string;
   fileName?: string;
+  cwd?: string;
 }
