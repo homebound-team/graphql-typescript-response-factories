@@ -3,5 +3,5 @@ import { join } from "node:path";
 
 export default async function globalSetup() {
   execSync("yarn build", { stdio: "inherit" });
-  execSync(join(__dirname, "scripts", "runCodegen.sh"), { stdio: "inherit" });
+  execSync(join(__dirname, "runCodegen.sh"), { stdio: "inherit" });
 }
