@@ -1,6 +1,6 @@
 import * as SingleFile from "./singleFile/graphql-types.generated";
 
-type TestType = "single-file";
+type TestType = "singleFile";
 
 interface TestObject {
   newSaveAuthorResponse: (variables: any, data: any) => any;
@@ -10,14 +10,14 @@ interface TestObject {
 }
 
 const getTestObjects = (testType: TestType): TestObject => {
-  if (testType === "single-file") {
+  if (testType === "singleFile") {
     return SingleFile;
   }
   throw `Unsupported test type parameter provided: ${testType}`;
 };
 
 const testLabels: { [key in TestType]: string } = {
-  "single-file": "Types and factories in a single file",
+  singleFile: "Types and factories in a single file",
 };
 
 function getTests(testType: TestType) {
@@ -102,5 +102,5 @@ function getTests(testType: TestType) {
 }
 
 describe("factories", () => {
-  getTests("single-file");
+  getTests("singleFile");
 });
