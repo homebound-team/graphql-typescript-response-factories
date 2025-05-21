@@ -9,19 +9,20 @@ import {
   OperationDefinitionNode,
   GraphQLNamedType,
 } from "graphql";
-import { Code, code, imp } from "ts-poet";
+import { Code, code } from "ts-poet";
 import PluginOutput = Types.PluginOutput;
 import type { Config } from "./types";
-import { generateNearOperationFileImport } from "./nearOperationFileImport";
+import { createFileReferenceFunction, type FileReferenceFunction } from "./fileReference";
 
 /** Generates `newQueryResponse({ ... })` factory functions in our `graphql-types` codegen output. */
 export const plugin: PluginFunction = async (schema, documents, config: Config) => {
+  const getFileReference = createFileReferenceFunction(config);
   const factories: Code[] = [];
   documents.forEach((d) => {
     if (d.document) {
       d.document.definitions.forEach((def) => {
         if (def.kind === "OperationDefinition" && def.name) {
-          factories.push(newOperationFactory(config, schema, def, d));
+          factories.push(newOperationFactory(schema, def, d, getFileReference));
         }
       });
     }
@@ -31,10 +32,10 @@ export const plugin: PluginFunction = async (schema, documents, config: Config) 
 };
 
 function newOperationFactory(
-  config: Config,
   schema: GraphQLSchema,
   def: OperationDefinitionNode,
   document: Types.DocumentFile,
+  fileReference: FileReferenceFunction,
 ): Code {
   const name = def.name?.value;
   const hasVariables = (def.variableDefinitions?.length || 0) > 0;
@@ -62,7 +63,7 @@ function newOperationFactory(
         })}
     }
 
-    export function new${name}Data(data: ${name}DataOptions): ${maybeImport(config, document, name + operation)} {
+    export function new${name}Data(data: ${name}DataOptions): ${fileReference(name + operation, document)} {
       return {
         __typename: "${operation}" as const,
         ${def.selectionSet.selections.map((s) => {
@@ -96,11 +97,11 @@ function newOperationFactory(
     }
 
     export function new${name}Response(
-      ${hasVariables ? code`variables: ${maybeImport(config, document, `${name}${operation}Variables`)},` : ""}
+      ${hasVariables ? code`variables: ${fileReference(`${name}${operation}Variables`, document)},` : ""}
       data: ${name}DataOptions | Error
     ): MockedResponse<${maybeImport(config, `${name}${operation}Variables`)}, ${name}${operation}> {
       return {
-        request: { query: ${maybeImport(config, document, name + "Document")}, ${hasVariables ? "variables, " : ""} },
+        request: { query: ${fileReference(name + "Document", document)}, ${hasVariables ? "variables, " : ""} },
         result: { data: data instanceof Error ? undefined : new${name}Data(data) },
         error: data instanceof Error ? data : undefined,
       };
@@ -132,12 +133,4 @@ const mockedResponse = `
 
 function maybeDenull(o: GraphQLOutputType): GraphQLOutputType {
   return o instanceof GraphQLNonNull ? o.ofType : o;
-}
-
-function maybeImport(config: Config, documentFile: Types.DocumentFile, typeName: string): Code {
-  if (config.nearOperationFilePresetConfig) {
-    return code`${imp(`${typeName}@${generateNearOperationFileImport(config, documentFile.location)}`)}`;
-  } else {
-    return code`${!!config.typesFilePath ? imp(`${typeName}@${config.typesFilePath}`) : typeName}`;
-  }
 }
