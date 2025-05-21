@@ -99,7 +99,7 @@ function newOperationFactory(
     export function new${name}Response(
       ${hasVariables ? code`variables: ${fileReference(`${name}${operation}Variables`, document)},` : ""}
       data: ${name}DataOptions | Error
-    ): MockedResponse<${maybeImport(config, `${name}${operation}Variables`)}, ${name}${operation}> {
+    ): MockedResponse<${fileReference(`${name}${operation}Variables`, document)}, ${name}${operation}> {
       return {
         request: { query: ${fileReference(name + "Document", document)}, ${hasVariables ? "variables, " : ""} },
         result: { data: data instanceof Error ? undefined : new${name}Data(data) },
