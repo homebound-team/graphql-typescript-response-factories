@@ -12,8 +12,8 @@ export function generateNearOperationFileImport(config: Config, location: string
 
   const absoluteFilePath = generateFilePath({ fileName, extension, folder }, location!);
 
-  // Strip `cwd`
-  const relativeFilePath = absoluteFilePath.replace(process.cwd(), "");
+  // Strip `cwd` (ensuring trailing slash)
+  const relativeFilePath = absoluteFilePath.replace(process.cwd() + (process.cwd().endsWith("/") ? "" : "/"), "");
 
   // Strip extension if we're emitting legacy CommonJS imports
   if (config.emitLegacyCommonJSImports) {
