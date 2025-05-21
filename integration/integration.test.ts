@@ -107,4 +107,5 @@ function getTests(testType: TestType) {
 
 describe("factories", () => {
   getTests("singleFile");
+  getTests("separateFactoryFile");
 });
