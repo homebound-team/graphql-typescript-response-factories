@@ -10,7 +10,18 @@ export function generateNearOperationFileImport(config: Config, location: string
   // https://github.com/dotansimha/graphql-code-generator-community/blob/152d2ddbd9a7b86d1f75ab7d86dfaacff5caa2be/packages/presets/near-operation-file/src/index.ts#L220-L222
   const { fileName = "", extension = ".generated.ts", folder = "" } = config.nearOperationFilePresetConfig;
 
-  return generateFilePath({ fileName, extension, folder }, location!);
+  const absoluteFilePath = generateFilePath({ fileName, extension, folder }, location!);
+
+  // Strip `cwd`
+  const relativeFilePath = absoluteFilePath.replace(process.cwd(), "");
+
+  // Strip extension if we're emitting legacy CommonJS imports
+  if (config.emitLegacyCommonJSImports) {
+    const parts = relativeFilePath.split(".");
+    return parts.slice(0, -1).join(".");
+  }
+
+  return relativeFilePath;
 }
 
 function validate(
