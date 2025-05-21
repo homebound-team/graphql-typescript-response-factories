@@ -1,7 +1,8 @@
 import * as SingleFile from "./singleFile/graphql-types.generated";
 import * as SeparateFactoryFile from "./separateFactoryFile/graphql-factories.generated";
+import * as NearOperationFile from "./nearOperationFile/graphql-factories.generated";
 
-type TestType = "singleFile" | "separateFactoryFile";
+type TestType = "singleFile" | "separateFactoryFile" | "nearOperationFile";
 
 interface TestObject {
   newSaveAuthorResponse: (variables: any, data: any) => any;
@@ -15,13 +16,17 @@ const getTestObjects = (testType: TestType): TestObject => {
     return SingleFile;
   } else if (testType === "separateFactoryFile") {
     return SeparateFactoryFile;
+  } else if (testType === "nearOperationFile") {
+    return NearOperationFile;
+  } else {
+    throw `Unsupported test type parameter provided: ${testType}`;
   }
-  throw `Unsupported test type parameter provided: ${testType}`;
 };
 
 const testLabels: { [key in TestType]: string } = {
   singleFile: "Types and factories in a single file",
   separateFactoryFile: "Types and factories in separate files",
+  nearOperationFile: "Types and factories in separate files, queries using 'near-operation-file' preset",
 };
 
 function getTests(testType: TestType) {
@@ -108,4 +113,5 @@ function getTests(testType: TestType) {
 describe("factories", () => {
   getTests("singleFile");
   getTests("separateFactoryFile");
+  getTests("nearOperationFile");
 });
