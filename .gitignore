@@ -11,3 +11,6 @@
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Integration generated files
+integration/*/*.generated.tsx

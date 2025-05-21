@@ -2,7 +2,7 @@ overwrite: true
 schema: "./integration/schema.graphql"
 documents: "./integration/queries.graphql"
 generates:
-  integration/graphql-types.tsx:
+  integration/singleFile/graphql-types.generated.tsx:
     plugins:
       - typescript
       - typescript-operations

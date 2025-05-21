@@ -7,8 +7,7 @@
     "build": "rm -rf build; tsc",
     "test": "jest",
     "prepack": "yarn build",
-    "format": "prettier --write 'src/**/*.{ts,js,tsx,jsx}'",
-    "graphql-codegen": "graphql-codegen --config ./integration/graphql-codegen.yml"
+    "format": "prettier --write 'src/**/*.{ts,js,tsx,jsx}'"
   },
   "dependencies": {
     "@graphql-codegen/plugin-helpers": "^5.1.0",
