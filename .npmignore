@@ -11,3 +11,4 @@
 /yarn.lock
 /package.json.bak
 /tsconfig.json
+/jest.config.js
