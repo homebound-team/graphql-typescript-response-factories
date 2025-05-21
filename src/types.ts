@@ -6,6 +6,10 @@ export type Config = RawConfig & {
   nearOperationFilePresetConfig?: NearOperationFilePresetConfig;
 };
 
+/**
+ * These are the config values we are about from the `near-operation-file` preset.
+ * We require this information to determine the correct import path for our generated factories.
+ */
 export interface NearOperationFilePresetConfig {
   extension?: string;
   folder?: string;
