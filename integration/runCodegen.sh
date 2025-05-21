@@ -14,4 +14,5 @@ find ./integration -name "graphql-codegen.*" -print0 | while IFS= read -r -d '' 
   echo "Running codegen for $file"
   cd "$(dirname "$file")"
   yarn graphql-codegen --config "$(basename "$file")"
+  cd "$SCRIPT_DIR/.."
 done

@@ -1,0 +1,15 @@
+overwrite: true
+schema: "./schema.graphql"
+documents: "./queries.graphql"
+generates:
+  graphql-types.generated.tsx:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
+  graphql-factories.generated.tsx:
+    config:
+      typesFilePath: "./graphql-types.generated"
+    plugins:
+      - "@homebound/graphql-typescript-factories"
+      - ../../build/index.js
