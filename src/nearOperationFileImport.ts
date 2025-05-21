@@ -1,22 +1,25 @@
 // The un-exported methods are copied from the `near-operation-file-preset` package.
 // In the future, we might choose to use the package directly, but the methods aren't directly exposed.
 import { parse as parsePath, join } from "path";
-import type { Config, NearOperationFilePresetConfig } from "./types";
+import type { NearOperationFilePresetConfig } from "./types";
 
-export function generateNearOperationFileImport(config: Config, location: string | undefined) {
-  validate(config, location);
+export type NearOperationFileConfigWithDefaults = Required<
+  Pick<NearOperationFilePresetConfig, "fileName" | "extension" | "folder">
+>;
 
-  // Defaults from
-  // https://github.com/dotansimha/graphql-code-generator-community/blob/152d2ddbd9a7b86d1f75ab7d86dfaacff5caa2be/packages/presets/near-operation-file/src/index.ts#L220-L222
-  const { fileName = "", extension = ".generated.ts", folder = "" } = config.nearOperationFilePresetConfig;
-
-  const absoluteFilePath = generateFilePath({ fileName, extension, folder }, location!);
+export function generateNearOperationFileImport(
+  nearOpFilePreset: NearOperationFileConfigWithDefaults,
+  location: string,
+  { emitLegacyCommonJSImports, cwd }: { emitLegacyCommonJSImports: boolean; cwd: string },
+) {
+  const { fileName, extension, folder } = nearOpFilePreset;
+  const absoluteFilePath = generateFilePath({ fileName, extension, folder }, location);
 
   // Strip `cwd` (ensuring trailing slash)
-  const relativeFilePath = absoluteFilePath.replace(process.cwd() + (process.cwd().endsWith("/") ? "" : "/"), "");
+  const relativeFilePath = absoluteFilePath.replace(cwd + (cwd.endsWith("/") ? "" : "/"), "");
 
   // Strip extension if we're emitting legacy CommonJS imports
-  if (config.emitLegacyCommonJSImports) {
+  if (emitLegacyCommonJSImports) {
     const parts = relativeFilePath.split(".");
     return parts.slice(0, -1).join(".");
   }
@@ -24,23 +27,8 @@ export function generateNearOperationFileImport(config: Config, location: string
   return relativeFilePath;
 }
 
-function validate(
-  config: Config,
-  location: string | undefined,
-): asserts config is Config & { nearOperationFilePresetConfig: Required<NearOperationFilePresetConfig> } {
-  if (!config.nearOperationFilePresetConfig) {
-    throw new Error("nearOperationFilePresetConfig is required when calling generateNearOperationFileImport()");
-  }
-  if (!location) {
-    throw new Error("location is required when calling generateNearOperationFileImport()");
-  }
-}
-
 // https://github.com/dotansimha/graphql-code-generator-community/blob/152d2ddbd9a7b86d1f75ab7d86dfaacff5caa2be/packages/presets/near-operation-file/src/index.ts#L247-L251
-function generateFilePath(
-  { fileName, extension, folder }: Required<Pick<NearOperationFilePresetConfig, "fileName" | "extension" | "folder">>,
-  location: string,
-) {
+function generateFilePath({ fileName, extension, folder }: NearOperationFileConfigWithDefaults, location: string) {
   const newFilePath = defineFilepathSubfolder(location, folder);
 
   return appendFileNameToFilePath(newFilePath, fileName, extension);
