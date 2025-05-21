@@ -92,7 +92,7 @@ function newOperationFactory(config: Config, schema: GraphQLSchema, def: Operati
     export function new${name}Response(
       ${hasVariables ? code`variables: ${maybeImport(config, `${name}${operation}Variables`)},` : ""}
       data: ${name}DataOptions | Error
-    ): MockedResponse<${name}${operation}Variables, ${name}${operation}> {
+    ): MockedResponse<${maybeImport(config, `${name}${operation}Variables`)}, ${name}${operation}> {
       return {
         request: { query: ${maybeImport(config, name + "Document")}, ${hasVariables ? "variables, " : ""} },
         result: { data: data instanceof Error ? undefined : new${name}Data(data) },
