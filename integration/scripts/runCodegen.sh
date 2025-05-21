@@ -12,5 +12,6 @@ echo "Running codegen for integration tests..."
 # Find all graphql-codegen files in any subfolder
 find ./integration -name "graphql-codegen.*" -print0 | while IFS= read -r -d '' file; do
   echo "Running codegen for $file"
-  yarn graphql-codegen --config "$file"
+  cd "$(dirname "$file")"
+  yarn graphql-codegen --config "$(basename "$file")"
 done

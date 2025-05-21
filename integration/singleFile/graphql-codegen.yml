@@ -1,11 +1,11 @@
 overwrite: true
-schema: "./integration/schema.graphql"
-documents: "./integration/queries.graphql"
+schema: "./schema.graphql"
+documents: "./queries.graphql"
 generates:
-  integration/singleFile/graphql-types.generated.tsx:
+  graphql-types.generated.tsx:
     plugins:
       - typescript
       - typescript-operations
       - typescript-react-apollo
       - "@homebound/graphql-typescript-factories"
-      - ./build/index.js
+      - ../../build/index.js
