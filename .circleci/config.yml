@@ -47,6 +47,9 @@ jobs:
     steps:
       - bootstrap
       - run: yarn build
+      - run:
+          name: Ensure codegen produced valid TypeScript
+          command: yarn tsc -p tsconfig.integration.json --noEmit
       - run: yarn test
 
   publish:

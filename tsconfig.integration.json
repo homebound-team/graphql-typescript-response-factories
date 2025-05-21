@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "lib": ["esnext"],
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": false,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "outDir": "build",
+    "jsx": "react"
+  },
+  "include": ["integration"]
+}
