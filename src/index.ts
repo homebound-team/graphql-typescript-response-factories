@@ -1,5 +1,4 @@
 import { PluginFunction, Types } from "@graphql-codegen/plugin-helpers";
-import { RawConfig } from "@graphql-codegen/visitor-plugin-common";
 import {
   GraphQLList,
   GraphQLNonNull,
@@ -10,17 +9,20 @@ import {
   OperationDefinitionNode,
   GraphQLNamedType,
 } from "graphql";
-import { Code, code, imp } from "ts-poet";
+import { Code, code } from "ts-poet";
 import PluginOutput = Types.PluginOutput;
+import type { Config } from "./types";
+import { createFileReferenceFunction, type FileReferenceFunction } from "./fileReference";
 
 /** Generates `newQueryResponse({ ... })` factory functions in our `graphql-types` codegen output. */
-export const plugin: PluginFunction = async (schema, documents, config: Config) => {
+export const plugin: PluginFunction = async (schema, documents, config: Config, info) => {
+  const getFileReference = createFileReferenceFunction(config, info?.outputFile);
   const factories: Code[] = [];
   documents.forEach((d) => {
     if (d.document) {
-      d.document.definitions.forEach((d) => {
-        if (d.kind === "OperationDefinition" && d.name) {
-          factories.push(newOperationFactory(config, schema, d));
+      d.document.definitions.forEach((def) => {
+        if (def.kind === "OperationDefinition" && def.name) {
+          factories.push(newOperationFactory(schema, def, d, getFileReference));
         }
       });
     }
@@ -29,7 +31,12 @@ export const plugin: PluginFunction = async (schema, documents, config: Config) 
   return { content } as PluginOutput;
 };
 
-function newOperationFactory(config: Config, schema: GraphQLSchema, def: OperationDefinitionNode): Code {
+function newOperationFactory(
+  schema: GraphQLSchema,
+  def: OperationDefinitionNode,
+  document: Types.DocumentFile,
+  fileReference: FileReferenceFunction,
+): Code {
   const name = def.name?.value;
   const hasVariables = (def.variableDefinitions?.length || 0) > 0;
   const operation = `${def.operation.charAt(0).toUpperCase()}${def.operation.slice(1)}`;
@@ -56,7 +63,7 @@ function newOperationFactory(config: Config, schema: GraphQLSchema, def: Operati
         })}
     }
 
-    export function new${name}Data(data: ${name}DataOptions): ${maybeImport(config, name + operation)} {
+    export function new${name}Data(data: ${name}DataOptions): ${fileReference(name + operation, document)} {
       return {
         __typename: "${operation}" as const,
         ${def.selectionSet.selections.map((s) => {
@@ -90,11 +97,11 @@ function newOperationFactory(config: Config, schema: GraphQLSchema, def: Operati
     }
 
     export function new${name}Response(
-      ${hasVariables ? code`variables: ${maybeImport(config, `${name}${operation}Variables`)},` : ""}
+      ${hasVariables ? code`variables: ${fileReference(`${name}${operation}Variables`, document)},` : ""}
       data: ${name}DataOptions | Error
-    ): MockedResponse<${maybeImport(config, `${name}${operation}Variables`)}, ${name}${operation}> {
+    ): MockedResponse<${fileReference(`${name}${operation}Variables`, document)}, ${name}${operation}> {
       return {
-        request: { query: ${maybeImport(config, name + "Document")}, ${hasVariables ? "variables, " : ""} },
+        request: { query: ${fileReference(name + "Document", document)}, ${hasVariables ? "variables, " : ""} },
         result: { data: data instanceof Error ? undefined : new${name}Data(data) },
         error: data instanceof Error ? data : undefined,
       };
@@ -126,13 +133,4 @@ const mockedResponse = `
 
 function maybeDenull(o: GraphQLOutputType): GraphQLOutputType {
   return o instanceof GraphQLNonNull ? o.ofType : o;
-}
-
-/** The config values we read from the graphql-codegen.yml file. */
-export type Config = RawConfig & {
-  typesFilePath?: string;
-};
-
-function maybeImport(config: Config, typeName: string): Code {
-  return code`${!!config.typesFilePath ? imp(`${typeName}@${config.typesFilePath}`) : typeName}`;
 }
