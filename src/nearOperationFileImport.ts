@@ -23,7 +23,12 @@ export function generateNearOperationFileImport(
   const outputFileDir = parsePath(join(cwd, outputFile)).dir;
 
   // Calculate relative path from outputFile's directory to the source file
-  const relativeFilePath = relative(outputFileDir, absoluteFilePath);
+  let relativeFilePath = relative(outputFileDir, absoluteFilePath);
+
+  // Add './' prefix if the file is in the same directory
+  if (!relativeFilePath.startsWith(".")) {
+    relativeFilePath = `./${relativeFilePath}`;
+  }
 
   // Strip extension if we're emitting legacy CommonJS imports
   if (emitLegacyCommonJSImports) {
