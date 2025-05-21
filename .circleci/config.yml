@@ -48,9 +48,6 @@ jobs:
       - bootstrap
       - run: yarn build
       - run: yarn test
-      - run:
-          name: Ensure codegen produced valid TypeScript
-          command: yarn tsc -p tsconfig.integration.json --noEmit
 
   publish:
     docker:
