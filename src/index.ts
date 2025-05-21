@@ -136,7 +136,7 @@ function maybeDenull(o: GraphQLOutputType): GraphQLOutputType {
 
 function maybeImport(config: Config, documentFile: Types.DocumentFile, typeName: string): Code {
   if (config.nearOperationFilePresetConfig) {
-    return code`${imp(generateFilePath(config.nearOperationFilePresetConfig, documentFile.location!))}`;
+    return code`${imp(`${typeName}@${generateFilePath(config.nearOperationFilePresetConfig, documentFile.location!)}`)}`;
   } else {
     return code`${!!config.typesFilePath ? imp(`${typeName}@${config.typesFilePath}`) : typeName}`;
   }
