@@ -12,7 +12,7 @@ import {
 import { Code, code, imp } from "ts-poet";
 import PluginOutput = Types.PluginOutput;
 import type { Config } from "./types";
-import { generateFilePath } from "./nearOperationFileImport";
+import { generateNearOperationFileImport } from "./nearOperationFileImport";
 
 /** Generates `newQueryResponse({ ... })` factory functions in our `graphql-types` codegen output. */
 export const plugin: PluginFunction = async (schema, documents, config: Config) => {
@@ -136,7 +136,7 @@ function maybeDenull(o: GraphQLOutputType): GraphQLOutputType {
 
 function maybeImport(config: Config, documentFile: Types.DocumentFile, typeName: string): Code {
   if (config.nearOperationFilePresetConfig) {
-    return code`${imp(`${typeName}@${generateFilePath(config.nearOperationFilePresetConfig, documentFile.location!)}`)}`;
+    return code`${imp(`${typeName}@${generateNearOperationFileImport(config, documentFile.location)}`)}`;
   } else {
     return code`${!!config.typesFilePath ? imp(`${typeName}@${config.typesFilePath}`) : typeName}`;
   }

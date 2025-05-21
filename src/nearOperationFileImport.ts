@@ -1,13 +1,35 @@
-// These methods are copied from the `near-operation-file-preset` package.
+// The un-exported methods are copied from the `near-operation-file-preset` package.
 // In the future, we might choose to use the package directly, but the methods aren't directly exposed.
 import { parse as parsePath, join } from "path";
-import type { NearOperationFilePresetConfig } from "./types";
+import type { Config, NearOperationFilePresetConfig } from "./types";
 
-// https://github.com/dotansimha/graphql-code-generator-community/blob/152d2ddbd9a7b86d1f75ab7d86dfaacff5caa2be/packages/presets/near-operation-file/src/index.ts#L247-L251
-export function generateFilePath(config: NearOperationFilePresetConfig, location: string) {
+export function generateNearOperationFileImport(config: Config, location: string | undefined) {
+  validate(config, location);
+
   // Defaults from
   // https://github.com/dotansimha/graphql-code-generator-community/blob/152d2ddbd9a7b86d1f75ab7d86dfaacff5caa2be/packages/presets/near-operation-file/src/index.ts#L220-L222
-  const { fileName = "", extension = ".generated.ts", folder = "" } = config;
+  const { fileName = "", extension = ".generated.ts", folder = "" } = config.nearOperationFilePresetConfig;
+
+  return generateFilePath({ fileName, extension, folder }, location!);
+}
+
+function validate(
+  config: Config,
+  location: string | undefined,
+): asserts config is Config & { nearOperationFilePresetConfig: Required<NearOperationFilePresetConfig> } {
+  if (!config.nearOperationFilePresetConfig) {
+    throw new Error("nearOperationFilePresetConfig is required when calling generateNearOperationFileImport()");
+  }
+  if (!location) {
+    throw new Error("location is required when calling generateNearOperationFileImport()");
+  }
+}
+
+// https://github.com/dotansimha/graphql-code-generator-community/blob/152d2ddbd9a7b86d1f75ab7d86dfaacff5caa2be/packages/presets/near-operation-file/src/index.ts#L247-L251
+function generateFilePath(
+  { fileName, extension, folder }: Required<Pick<NearOperationFilePresetConfig, "fileName" | "extension" | "folder">>,
+  location: string,
+) {
   const newFilePath = defineFilepathSubfolder(location, folder);
 
   return appendFileNameToFilePath(newFilePath, fileName, extension);
