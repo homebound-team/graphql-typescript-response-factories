@@ -1,15 +1,15 @@
 overwrite: true
-schema: "./integration/schema.graphql"
-documents: "./integration/queries.graphql"
+schema: "./schema.graphql"
+documents: "./queries.graphql"
 generates:
-  integration/separateFactoryFile/graphql-types.generated.tsx:
+  graphql-types.generated.tsx:
     plugins:
       - typescript
       - typescript-operations
       - typescript-react-apollo
-  integration/separateFactoryFile/graphql-factories.generated.tsx:
+  graphql-factories.generated.tsx:
     config:
       typesFilePath: "./graphql-types.generated"
     plugins:
       - "@homebound/graphql-typescript-factories"
-      - ./build/index.js
+      - ../../build/index.js
