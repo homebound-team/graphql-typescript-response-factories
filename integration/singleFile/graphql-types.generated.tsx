@@ -324,26 +324,60 @@ export type MultipleAuthorsLazyQueryHookResult = ReturnType<typeof useMultipleAu
 export type MultipleAuthorsSuspenseQueryHookResult = ReturnType<typeof useMultipleAuthorsSuspenseQuery>;
 export type MultipleAuthorsQueryResult = Apollo.QueryResult<MultipleAuthorsQuery, MultipleAuthorsQueryVariables>;
 const factories: Record<string, Function> = {};
+export interface FactoryOptions {
+  withCycles?: boolean;
+}
 type RequireTypename<T extends { __typename?: string }> = Omit<T, "__typename"> & Required<Pick<T, "__typename">>;
+/**
+ * Mirrors factory runtime behavior by requiring __typename on factory-created object results.
+ *
+ * GraphQL Codegen's base schema types correctly keep __typename optional because raw GraphQL
+ * objects only include it when an operation selects it or a client adds it. Operation and
+ * fragment result types can require __typename when it is selected. Factory results are a
+ * separate case: these factories always assign __typename recursively at runtime, so their
+ * public return type should expose that stronger shape without changing the base schema types.
+ */
+type FactoryResult<T> = T extends ReadonlyArray<infer U> ? Array<FactoryResult<U>> : T extends object
+  // Rebuild the object instead of intersecting with T, so raw nested field types do not leak through arrays.
+  // I.e. Author.books.pop() should return a Book with required __typename, not the raw schema Book.
+  ? "__typename" extends keyof T
+    ? Omit<{ [K in keyof T]: FactoryResult<T[K]> }, "__typename"> & {
+      __typename: NonNullable<T extends { __typename?: infer N } ? N : never>;
+    }
+  : T
+: T;
+
+type FactoryInput<T, TOptions> = T | FactoryResult<T> | TOptions;
+type FactoryCache = Record<string, any> & { active?: Set<object>; all?: Set<object>; withCycles?: boolean };
 export interface AuthorOptions {
   __typename?: "Author";
   birthday?: Author["birthday"];
   name?: Author["name"];
   popularity?: Author["popularity"];
-  summary?: AuthorSummary | AuthorSummaryOptions;
+  summary?: FactoryInput<AuthorSummary, AuthorSummaryOptions>;
   working?: Author["working"];
 }
 
-export function newAuthor(options: AuthorOptions = {}, cache: Record<string, any> = {}): Author {
+export function newAuthor(options?: AuthorOptions, factoryOptions?: FactoryOptions): FactoryResult<Author>;
+export function newAuthor(
+  options: AuthorOptions = {},
+  factoryOptions: FactoryOptions = {},
+  cache: FactoryCache = newFactoryCache(factoryOptions),
+): FactoryResult<Author> {
   const o = (options.__typename ? options : cache["Author"] = {}) as Author;
   (cache.all ??= new Set()).add(o);
-  o.__typename = "Author";
-  o.birthday = options.birthday ?? null;
-  o.name = options.name ?? "name";
-  o.popularity = options.popularity ?? Popularity.High;
-  o.summary = maybeNew("AuthorSummary", options.summary, cache, options.hasOwnProperty("summary"));
-  o.working = options.working ?? null;
-  return o;
+  (cache.active ??= new Set()).add(o);
+  try {
+    o.__typename = "Author";
+    o.birthday = options.birthday ?? null;
+    o.name = options.name ?? "name";
+    o.popularity = options.popularity ?? Popularity.High;
+    o.summary = maybeNew("AuthorSummary", options.summary, cache, options.hasOwnProperty("summary"));
+    o.working = options.working ?? null;
+    return o as FactoryResult<Author>;
+  } finally {
+    cache.active?.delete(o);
+  }
 }
 
 factories["Author"] = newAuthor;
@@ -351,18 +385,31 @@ factories["Author"] = newAuthor;
 export interface AuthorSummaryOptions {
   __typename?: "AuthorSummary";
   amountOfSales?: AuthorSummary["amountOfSales"];
-  author?: Author | AuthorOptions;
+  author?: FactoryInput<Author, AuthorOptions>;
   numberOfBooks?: AuthorSummary["numberOfBooks"];
 }
 
-export function newAuthorSummary(options: AuthorSummaryOptions = {}, cache: Record<string, any> = {}): AuthorSummary {
+export function newAuthorSummary(
+  options?: AuthorSummaryOptions,
+  factoryOptions?: FactoryOptions,
+): FactoryResult<AuthorSummary>;
+export function newAuthorSummary(
+  options: AuthorSummaryOptions = {},
+  factoryOptions: FactoryOptions = {},
+  cache: FactoryCache = newFactoryCache(factoryOptions),
+): FactoryResult<AuthorSummary> {
   const o = (options.__typename ? options : cache["AuthorSummary"] = {}) as AuthorSummary;
   (cache.all ??= new Set()).add(o);
-  o.__typename = "AuthorSummary";
-  o.amountOfSales = options.amountOfSales ?? null;
-  o.author = maybeNew("Author", options.author, cache, options.hasOwnProperty("author"));
-  o.numberOfBooks = options.numberOfBooks ?? 0;
-  return o;
+  (cache.active ??= new Set()).add(o);
+  try {
+    o.__typename = "AuthorSummary";
+    o.amountOfSales = options.amountOfSales ?? null;
+    o.author = maybeNew("Author", options.author, cache, options.hasOwnProperty("author"));
+    o.numberOfBooks = options.numberOfBooks ?? 0;
+    return o as FactoryResult<AuthorSummary>;
+  } finally {
+    cache.active?.delete(o);
+  }
 }
 
 factories["AuthorSummary"] = newAuthorSummary;
@@ -372,48 +419,78 @@ export interface BookOptions {
   name?: Book["name"];
 }
 
-export function newBook(options: BookOptions = {}, cache: Record<string, any> = {}): Book {
+export function newBook(options?: BookOptions, factoryOptions?: FactoryOptions): FactoryResult<Book>;
+export function newBook(
+  options: BookOptions = {},
+  factoryOptions: FactoryOptions = {},
+  cache: FactoryCache = newFactoryCache(factoryOptions),
+): FactoryResult<Book> {
   const o = (options.__typename ? options : cache["Book"] = {}) as Book;
   (cache.all ??= new Set()).add(o);
-  o.__typename = "Book";
-  o.name = options.name ?? "name";
-  return o;
+  (cache.active ??= new Set()).add(o);
+  try {
+    o.__typename = "Book";
+    o.name = options.name ?? "name";
+    return o as FactoryResult<Book>;
+  } finally {
+    cache.active?.delete(o);
+  }
 }
 
 factories["Book"] = newBook;
 
 export interface SaveAuthorLikeResultOptions {
   __typename?: "SaveAuthorLikeResult";
-  authors?: Array<Author | AuthorLike | AuthorLikeOptions>;
+  authors?: Array<AuthorLike | FactoryResult<AuthorLikeType> | AuthorLikeOptions>;
 }
 
 export function newSaveAuthorLikeResult(
+  options?: SaveAuthorLikeResultOptions,
+  factoryOptions?: FactoryOptions,
+): FactoryResult<SaveAuthorLikeResult>;
+export function newSaveAuthorLikeResult(
   options: SaveAuthorLikeResultOptions = {},
-  cache: Record<string, any> = {},
-): SaveAuthorLikeResult {
+  factoryOptions: FactoryOptions = {},
+  cache: FactoryCache = newFactoryCache(factoryOptions),
+): FactoryResult<SaveAuthorLikeResult> {
   const o = (options.__typename ? options : cache["SaveAuthorLikeResult"] = {}) as SaveAuthorLikeResult;
   (cache.all ??= new Set()).add(o);
-  o.__typename = "SaveAuthorLikeResult";
-  o.authors = (options.authors ?? []).map((i) => maybeNew("AuthorLike", i, cache, options.hasOwnProperty("authors")));
-  return o;
+  (cache.active ??= new Set()).add(o);
+  try {
+    o.__typename = "SaveAuthorLikeResult";
+    o.authors = (options.authors ?? []).map((i) => maybeNew("AuthorLike", i, cache, options.hasOwnProperty("authors")));
+    return o as FactoryResult<SaveAuthorLikeResult>;
+  } finally {
+    cache.active?.delete(o);
+  }
 }
 
 factories["SaveAuthorLikeResult"] = newSaveAuthorLikeResult;
 
 export interface SaveAuthorResultOptions {
   __typename?: "SaveAuthorResult";
-  author?: Author | AuthorOptions;
+  author?: FactoryInput<Author, AuthorOptions>;
 }
 
 export function newSaveAuthorResult(
+  options?: SaveAuthorResultOptions,
+  factoryOptions?: FactoryOptions,
+): FactoryResult<SaveAuthorResult>;
+export function newSaveAuthorResult(
   options: SaveAuthorResultOptions = {},
-  cache: Record<string, any> = {},
-): SaveAuthorResult {
+  factoryOptions: FactoryOptions = {},
+  cache: FactoryCache = newFactoryCache(factoryOptions),
+): FactoryResult<SaveAuthorResult> {
   const o = (options.__typename ? options : cache["SaveAuthorResult"] = {}) as SaveAuthorResult;
   (cache.all ??= new Set()).add(o);
-  o.__typename = "SaveAuthorResult";
-  o.author = maybeNew("Author", options.author, cache, options.hasOwnProperty("author"));
-  return o;
+  (cache.active ??= new Set()).add(o);
+  try {
+    o.__typename = "SaveAuthorResult";
+    o.author = maybeNew("Author", options.author, cache, options.hasOwnProperty("author"));
+    return o as FactoryResult<SaveAuthorResult>;
+  } finally {
+    cache.active?.delete(o);
+  }
 }
 
 factories["SaveAuthorResult"] = newSaveAuthorResult;
@@ -424,12 +501,23 @@ export type AuthorLikeType = Author;
 
 export type AuthorLikeTypeName = "Author";
 
-export function newAuthorLike(): Author;
-export function newAuthorLike(options: AuthorOptions, cache?: Record<string, any>): Author;
-export function newAuthorLike(options: AuthorLikeOptions = {}, cache: Record<string, any> = {}): AuthorLikeType {
+export function newAuthorLike(): FactoryResult<Author>;
+export function newAuthorLike(options: AuthorOptions, factoryOptions?: FactoryOptions): FactoryResult<Author>;
+export function newAuthorLike(
+  options: AuthorLikeOptions = {},
+  factoryOptions: FactoryOptions = {},
+  cache: FactoryCache = newFactoryCache(factoryOptions),
+): FactoryResult<AuthorLikeType> {
   const { __typename = "Author" } = options ?? {};
-  const maybeCached = Object.keys(options).length === 0 ? cache[__typename] : undefined;
-  return maybeCached ?? maybeNew(__typename, options ?? {}, cache);
+  const shouldUseCache = Object.keys(options).length === 0;
+  const maybeCached = shouldUseCache ? getCachedValue(__typename, cache) : undefined;
+  if (maybeCached !== undefined) {
+    return maybeCached;
+  }
+  if (shouldUseCache && hasActiveCachedValue(__typename, cache)) {
+    return undefined as any;
+  }
+  return maybeNew(__typename, options ?? {}, cache);
 }
 
 factories["AuthorLike"] = newAuthorLike;
@@ -448,43 +536,74 @@ function nextFactoryId(objectName: string): string {
   return tag + ":" + nextId;
 }
 
+function newFactoryCache(factoryOptions: FactoryOptions = {}): FactoryCache {
+  return { withCycles: factoryOptions.withCycles === true };
+}
+
+function reuseWouldCreateCycle(cache: FactoryCache, value: object): boolean {
+  return cache.withCycles !== true && cache.active?.has(value) === true;
+}
+
+function getCachedValue(type: string, cache: FactoryCache): any {
+  const cachedValue = cache[type];
+  if (cachedValue === undefined) {
+    return undefined;
+  }
+  return reuseWouldCreateCycle(cache, cachedValue) ? undefined : cachedValue;
+}
+
+function hasActiveCachedValue(type: string, cache: FactoryCache): boolean {
+  const cachedValue = cache[type];
+  return cachedValue !== undefined && reuseWouldCreateCycle(cache, cachedValue);
+}
+
 function maybeNew(
   type: string,
   value: { __typename?: string } | object | undefined,
-  cache: Record<string, any>,
+  cache: FactoryCache,
   isSet: boolean = false,
 ): any {
   if (value === undefined) {
-    return isSet ? undefined : cache[type] || factories[type]({}, cache);
+    const cachedValue = getCachedValue(type, cache);
+    if (cachedValue !== undefined || isSet || hasActiveCachedValue(type, cache)) {
+      return cachedValue;
+    }
+    return factories[type]({}, undefined, cache);
   } else if ("__typename" in value && value.__typename) {
-    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
+    if (cache.all?.has(value)) {
+      return reuseWouldCreateCycle(cache, value) ? undefined : value;
+    }
+    return factories[value.__typename](value, undefined, cache);
   } else {
-    return factories[type](value, cache);
+    return factories[type](value, undefined, cache);
   }
 }
 
 function maybeNewOrNull(
   type: string,
   value: { __typename?: string } | object | undefined | null,
-  cache: Record<string, any>,
+  cache: FactoryCache,
 ): any {
   if (!value) {
     return null;
   } else if ("__typename" in value && value.__typename) {
-    return cache.all?.has(value) ? value : factories[value.__typename](value, cache);
+    if (cache.all?.has(value)) {
+      return reuseWouldCreateCycle(cache, value) ? undefined : value;
+    }
+    return factories[value.__typename](value, undefined, cache);
   } else {
-    return factories[type](value, cache);
+    return factories[type](value, undefined, cache);
   }
 }
 
 interface GetAuthorSummariesDataOptions {
-  authorSummaries?: (AuthorSummary | AuthorSummaryOptions)[];
+  authorSummaries?: FactoryInput<AuthorSummary, AuthorSummaryOptions>[];
 }
 
 export function newGetAuthorSummariesData(data: GetAuthorSummariesDataOptions): GetAuthorSummariesQuery {
   return {
     __typename: "Query" as const,
-    authorSummaries: data["authorSummaries"]?.map((d) => newAuthorSummary(d)) || [],
+    authorSummaries: data["authorSummaries"]?.map((d) => maybeNew("AuthorSummary", d, {})) || [],
   } as any;
 }
 
@@ -498,7 +617,7 @@ export function newGetAuthorSummariesResponse(
   };
 }
 interface SaveAuthorDataOptions {
-  saveAuthor?: SaveAuthorResult | SaveAuthorResultOptions;
+  saveAuthor?: FactoryInput<SaveAuthorResult, SaveAuthorResultOptions>;
 }
 
 export function newSaveAuthorData(data: SaveAuthorDataOptions): SaveAuthorMutation {
@@ -519,7 +638,7 @@ export function newSaveAuthorResponse(
   };
 }
 interface SaveAuthorLikeDataOptions {
-  saveAuthorLike?: (AuthorLike | AuthorLikeOptions)[];
+  saveAuthorLike?: FactoryInput<AuthorLike, AuthorLikeOptions>[];
 }
 
 export function newSaveAuthorLikeData(data: SaveAuthorLikeDataOptions): SaveAuthorLikeMutation {
@@ -540,7 +659,7 @@ export function newSaveAuthorLikeResponse(
   };
 }
 interface CurrentAuthorDataOptions {
-  currentAuthor?: Author | AuthorOptions | null;
+  currentAuthor?: FactoryInput<Author, AuthorOptions> | null;
 }
 
 export function newCurrentAuthorData(data: CurrentAuthorDataOptions): CurrentAuthorQuery {
@@ -560,8 +679,8 @@ export function newCurrentAuthorResponse(
   };
 }
 interface MultipleAuthorsDataOptions {
-  authorOne?: Author | AuthorOptions | null;
-  authorTwo?: Author | AuthorOptions | null;
+  authorOne?: FactoryInput<Author, AuthorOptions> | null;
+  authorTwo?: FactoryInput<Author, AuthorOptions> | null;
 }
 
 export function newMultipleAuthorsData(data: MultipleAuthorsDataOptions): MultipleAuthorsQuery {

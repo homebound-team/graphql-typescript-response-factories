@@ -53,10 +53,10 @@ function newOperationFactory(
               let type = maybeDenull(field.type) as GraphQLNamedType;
               if (type instanceof GraphQLList) {
                 type = maybeDenull(type.ofType) as GraphQLNamedType;
-                return `${key}?: (${type.name} | ${type.name}Options)[];`;
+                return `${key}?: FactoryInput<${type.name}, ${type.name}Options>[];`;
               } else {
                 const orNull = field.type instanceof GraphQLNonNull ? "" : " | null";
-                return `${key}?: ${type.name} | ${type.name}Options${orNull};`;
+                return `${key}?: FactoryInput<${type.name}, ${type.name}Options>${orNull};`;
               }
             }
           }
@@ -80,7 +80,7 @@ function newOperationFactory(
                 if (type instanceof GraphQLInterfaceType) {
                   return `${key}: data["${key}"]?.map(d => maybeNew("${type.name}", d, {})) || [],`;
                 } else if (type instanceof GraphQLObjectType) {
-                  return `${key}: data["${key}"]?.map(d => new${type.name}(d)) || [],`;
+                  return `${key}: data["${key}"]?.map(d => maybeNew("${type.name}", d, {})) || [],`;
                 } else {
                   throw new Error(`Unsupported return type ${type}`);
                 }
