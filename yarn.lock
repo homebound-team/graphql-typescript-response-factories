@@ -1064,7 +1064,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphql-codegen/plugin-helpers@npm:^5.0.3, @graphql-codegen/plugin-helpers@npm:^5.0.4, @graphql-codegen/plugin-helpers@npm:^5.1.0":
+"@graphql-codegen/plugin-helpers@npm:^5.0.3, @graphql-codegen/plugin-helpers@npm:^5.1.0":
   version: 5.1.0
   resolution: "@graphql-codegen/plugin-helpers@npm:5.1.0"
   dependencies:
@@ -1177,7 +1177,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphql-codegen/visitor-plugin-common@npm:5.8.0, @graphql-codegen/visitor-plugin-common@npm:^5.2.0, @graphql-codegen/visitor-plugin-common@npm:^5.8.0":
+"@graphql-codegen/visitor-plugin-common@npm:5.8.0, @graphql-codegen/visitor-plugin-common@npm:^5.8.0":
   version: 5.8.0
   resolution: "@graphql-codegen/visitor-plugin-common@npm:5.8.0"
   dependencies:
@@ -1623,17 +1623,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@homebound/graphql-typescript-factories@npm:^2.73.0":
-  version: 2.73.0
-  resolution: "@homebound/graphql-typescript-factories@npm:2.73.0"
+"@homebound/graphql-typescript-factories@npm:^2.79.0":
+  version: 2.79.0
+  resolution: "@homebound/graphql-typescript-factories@npm:2.79.0"
   dependencies:
-    "@graphql-codegen/plugin-helpers": "npm:^5.0.4"
-    "@graphql-codegen/visitor-plugin-common": "npm:^5.2.0"
+    "@graphql-codegen/plugin-helpers": "npm:^5.1.0"
+    "@graphql-codegen/visitor-plugin-common": "npm:^5.8.0"
     change-case: "npm:^4.1.2"
-    ts-poet: "npm:^6.9.0"
+    ts-poet: "npm:^6.11.0"
   peerDependencies:
     graphql: ^15.0.0 || ^16.0.0
-  checksum: 10c0/69cb3e5a9029a9a7cec08cb798bb2a7e16ca502b8f0419abff3b440cbd4e8ef43a240975c6656274b7d1b211f25acd7a23ba33ca0529e21760c1d2ad292dce6d
+  checksum: 10c0/5fac5e9ed96cb610d9de23500e3dc34ffad43f2b23965c6c5e25aa97f667848f216ebcd34b33ccdd9bc9dba44dbbd91cb595fde0fd9b94bb7021d3c3519e9bd0
   languageName: node
   linkType: hard
 
@@ -1647,7 +1647,7 @@ __metadata:
     "@graphql-codegen/plugin-helpers": "npm:^5.1.0"
     "@graphql-codegen/typescript-operations": "npm:^4.6.1"
     "@graphql-codegen/typescript-react-apollo": "npm:^4.3.2"
-    "@homebound/graphql-typescript-factories": "npm:^2.73.0"
+    "@homebound/graphql-typescript-factories": "npm:^2.79.0"
     "@types/jest": "npm:^29.5.12"
     "@types/react": "npm:^18.3.2"
     graphql: "npm:^16.11.0"
@@ -6839,7 +6839,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-poet@npm:^6.11.0, ts-poet@npm:^6.9.0":
+"ts-poet@npm:^6.11.0":
   version: 6.11.0
   resolution: "ts-poet@npm:6.11.0"
   dependencies:

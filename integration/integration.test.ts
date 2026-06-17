@@ -58,7 +58,7 @@ function getTests(testType: TestType) {
               "summary": {
                 "__typename": "AuthorSummary",
                 "amountOfSales": null,
-                "author": [Circular],
+                "author": undefined,
                 "numberOfBooks": 0,
               },
               "working": null,
@@ -84,7 +84,7 @@ function getTests(testType: TestType) {
                 "birthday": null,
                 "name": "name",
                 "popularity": "High",
-                "summary": [Circular],
+                "summary": undefined,
                 "working": null,
               },
               "numberOfBooks": 0,
@@ -114,4 +114,20 @@ describe("factories", () => {
   getTests("singleFile");
   getTests("separateFactoryFile");
   getTests("nearOperationFile");
+
+  it("accepts factory results in response list options", () => {
+    const singleFileResponse = SingleFile.newGetAuthorSummariesResponse({
+      authorSummaries: [SingleFile.newAuthorSummary()],
+    });
+    const separateFactoryFileResponse = SeparateFactoryFile.newGetAuthorSummariesResponse({
+      authorSummaries: [SeparateFactoryFile.newAuthorSummary()],
+    });
+    const nearOperationFileResponse = NearOperationFile.newGetAuthorSummariesResponse({
+      authorSummaries: [NearOperationFile.newAuthorSummary()],
+    });
+
+    expect(singleFileResponse.result.data?.authorSummaries[0].__typename).toEqual("AuthorSummary");
+    expect(separateFactoryFileResponse.result.data?.authorSummaries[0].__typename).toEqual("AuthorSummary");
+    expect(nearOperationFileResponse.result.data?.authorSummaries[0].__typename).toEqual("AuthorSummary");
+  });
 });
